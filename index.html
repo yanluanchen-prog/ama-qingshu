@@ -578,50 +578,38 @@
   }
   .envelope-float {
     position: relative;
-    width: 200px;
-    height: 130px;
+    width: 150px;
+    height: 200px;
     margin: 0 auto;
-    animation: envFloat 2.6s ease-in-out infinite;
-    filter: drop-shadow(0 10px 24px rgba(0,0,0,0.55));
+    animation: envFloat 3.2s ease-in-out infinite;
+    filter: drop-shadow(0 10px 26px rgba(0,0,0,0.6));
   }
   @keyframes envFloat {
-    0%, 100% { transform: translateY(0) rotate(-1deg); }
-    50% { transform: translateY(-10px) rotate(1deg); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
   }
   .envelope-svg {
     width: 100%;
     height: 100%;
     display: block;
+    overflow: visible;
   }
-  .envelope-seal {
-    position: absolute;
-    top: 38px;
-    right: 18px;
-    width: 54px;
-    height: 54px;
-    border: 3px solid #b73329;
-    background: rgba(183, 51, 41, 0.88);
-    color: #f3e7cf;
-    font-family: "STKaiti", "KaiTi", "楷体", serif;
-    font-weight: 800;
-    font-size: 16px;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    box-shadow: inset 0 0 0 1px rgba(243, 231, 207, 0.3), 0 2px 6px rgba(0,0,0,0.3);
-    transform: rotate(-60deg) scale(3);
+  /* 信笺从信封上方滑入 */
+  .env-letter {
+    transform: translateY(-58px);
     opacity: 0;
-    animation: sealStamp 0.9s 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+    transform-box: fill-box;
+    transform-origin: center;
   }
-  @keyframes sealStamp {
-    0%   { transform: rotate(-60deg) scale(3); opacity: 0; }
-    40%  { opacity: 1; }
-    60%  { transform: rotate(-8deg) scale(1.15); opacity: 1; }
-    78%  { transform: rotate(-14deg) scale(0.92); }
-    92%  { transform: rotate(-10deg) scale(1.04); }
-    100% { transform: rotate(-12deg) scale(1); opacity: 1; }
+  .loading.show .env-letter {
+    animation: letterSlideIn 1.15s 0.35s cubic-bezier(0.25, 0.1, 0.25, 1.15) forwards;
+  }
+  @keyframes letterSlideIn {
+    0%   { transform: translateY(-58px); opacity: 0; }
+    25%  { transform: translateY(-58px); opacity: 1; }
+    78%  { transform: translateY(0); opacity: 1; }
+    88%  { transform: translateY(-2px); opacity: 1; }
+    100% { transform: translateY(0); opacity: 1; }
   }
   .envelope-msg {
     margin-top: 26px;
@@ -648,25 +636,25 @@
   }
   .delivered.show {
     display: flex;
-    animation: deliveredOverlay 1.8s ease-out forwards;
+    animation: deliveredOverlay 3s ease-out forwards;
   }
   @keyframes deliveredOverlay {
-    0% { background: rgba(20, 12, 6, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
-    18% { background: rgba(20, 12, 6, 0.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-    82% { background: rgba(20, 12, 6, 0.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-    100% { background: rgba(20, 12, 6, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+    0%  { background: rgba(20, 12, 6, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+    15% { background: rgba(20, 12, 6, 0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    85% { background: rgba(20, 12, 6, 0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    100%{ background: rgba(20, 12, 6, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
   }
   .delivered-content {
     text-align: center;
   }
   .delivered-stamp {
-    width: 130px;
-    height: 130px;
+    width: 140px;
+    height: 140px;
     border: 5px solid #b73329;
     background: rgba(183, 51, 41, 0.12);
     color: #b73329;
     font-family: "STKaiti", "KaiTi", "楷体", serif;
-    font-size: 44px;
+    font-size: 46px;
     font-weight: 800;
     letter-spacing: 6px;
     padding-left: 6px;
@@ -674,39 +662,40 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 0 0 2px rgba(183, 51, 41, 0.4), 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: inset 0 0 0 2px rgba(183, 51, 41, 0.4), 0 4px 18px rgba(0,0,0,0.45);
     margin: 0 auto;
     opacity: 0;
     transform: rotate(-60deg) scale(2.2);
   }
   .delivered.show .delivered-stamp {
-    animation: deliveredStamp 1.7s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards;
+    animation: deliveredStamp 2.9s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards;
   }
   @keyframes deliveredStamp {
     0%   { transform: rotate(-60deg) scale(2.2); opacity: 0; }
-    20%  { opacity: 1; }
-    38%  { transform: rotate(-8deg) scale(1.15); opacity: 1; }
-    52%  { transform: rotate(-14deg) scale(0.95); }
-    66%  { transform: rotate(-10deg) scale(1.03); opacity: 1; }
-    82%  { transform: rotate(-12deg) scale(1); opacity: 1; }
+    12%  { opacity: 1; }
+    22%  { transform: rotate(-8deg) scale(1.15); opacity: 1; }
+    30%  { transform: rotate(-14deg) scale(0.95); }
+    38%  { transform: rotate(-10deg) scale(1.03); opacity: 1; }
+    46%  { transform: rotate(-12deg) scale(1); opacity: 1; }
+    86%  { transform: rotate(-12deg) scale(1); opacity: 1; }
     100% { transform: rotate(-12deg) scale(1); opacity: 0; }
   }
   .delivered-msg {
-    margin-top: 28px;
+    margin-top: 30px;
     color: #c9a76e;
-    font-size: 16px;
+    font-size: 17px;
     letter-spacing: 10px;
     padding-left: 10px;
     opacity: 0;
   }
   .delivered.show .delivered-msg {
-    animation: deliveredMsg 1.7s ease-out forwards;
+    animation: deliveredMsg 2.9s ease-out forwards;
   }
   @keyframes deliveredMsg {
-    0% { opacity: 0; transform: translateY(8px); }
-    30% { opacity: 0; transform: translateY(8px); }
-    55% { opacity: 1; transform: translateY(0); }
-    82% { opacity: 1; transform: translateY(0); }
+    0%   { opacity: 0; transform: translateY(8px); }
+    18%  { opacity: 0; transform: translateY(8px); }
+    32%  { opacity: 1; transform: translateY(0); }
+    86%  { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-4px); }
   }
 
@@ -829,42 +818,60 @@
 <div class="loading" id="loading">
   <div class="envelope-scene">
     <div class="envelope-float">
-      <svg class="envelope-svg" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-        <!-- 信封主体 -->
-        <rect x="3" y="3" width="194" height="124" rx="2"
-              fill="#f3e7cf" stroke="#8b1e15" stroke-width="2"/>
-        <!-- 航空邮件边条: 上边 -->
-        <g fill="#b73329">
-          <rect x="14" y="7" width="8" height="4"/>
-          <rect x="30" y="7" width="8" height="4"/>
-          <rect x="46" y="7" width="8" height="4"/>
-          <rect x="146" y="7" width="8" height="4"/>
-          <rect x="162" y="7" width="8" height="4"/>
-          <rect x="178" y="7" width="8" height="4"/>
+      <svg class="envelope-svg" viewBox="0 0 150 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- 信笺 · 从信封上方滑入(先绘制,会被信封遮挡下半部分) -->
+        <g class="env-letter">
+          <rect x="22" y="8" width="106" height="70" fill="#faf2de" stroke="#8b1e15" stroke-width="0.6" rx="1"/>
+          <line x1="32" y1="22" x2="118" y2="22" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
+          <line x1="32" y1="32" x2="108" y2="32" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
+          <line x1="32" y1="42" x2="115" y2="42" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
+          <line x1="32" y1="52" x2="100" y2="52" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
+          <line x1="32" y1="62" x2="112" y2="62" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
         </g>
-        <!-- 航空邮件边条: 下边 -->
-        <g fill="#b73329">
-          <rect x="14" y="119" width="8" height="4"/>
-          <rect x="30" y="119" width="8" height="4"/>
-          <rect x="46" y="119" width="8" height="4"/>
-          <rect x="146" y="119" width="8" height="4"/>
-          <rect x="162" y="119" width="8" height="4"/>
-          <rect x="178" y="119" width="8" height="4"/>
+
+        <!-- 信封主体(米黄纸) -->
+        <rect x="4" y="50" width="142" height="146" fill="#f5eacd" stroke="#8b1e15" stroke-width="1.6"/>
+
+        <!-- 中央红带(侨批标志性特征) -->
+        <rect x="54" y="50" width="42" height="146" fill="#c93a2e"/>
+
+        <!-- 红带两侧细线 -->
+        <line x1="54" y1="50" x2="54" y2="196" stroke="#8b1e15" stroke-width="0.5" opacity="0.4"/>
+        <line x1="96" y1="50" x2="96" y2="196" stroke="#8b1e15" stroke-width="0.5" opacity="0.4"/>
+
+        <!-- 红带上抽象毛笔字(受信人名) -->
+        <g fill="#2c1810" opacity="0.85">
+          <rect x="68" y="78" width="14" height="3" rx="0.5"/>
+          <rect x="73" y="84" width="4" height="24" rx="0.5"/>
+          <rect x="65" y="105" width="20" height="3" rx="0.5"/>
+
+          <rect x="68" y="126" width="14" height="3" rx="0.5"/>
+          <rect x="73" y="132" width="4" height="22" rx="0.5"/>
+          <rect x="65" y="152" width="20" height="3" rx="0.5"/>
+
+          <rect x="70" y="170" width="10" height="3" rx="0.5"/>
+          <rect x="73" y="176" width="4" height="14" rx="0.5"/>
         </g>
-        <!-- 信封折线 (V 型) -->
-        <path d="M 3 3 L 100 70 L 197 3" fill="none" stroke="#8b1e15" stroke-width="1.2" opacity="0.45"/>
-        <!-- 左上邮戳位 竖排"汕頭" -->
-        <g fill="#8b1e15" font-family="STKaiti, KaiTi, serif" font-size="10" font-weight="700" opacity="0.75">
-          <text x="18" y="36">汕</text>
-          <text x="18" y="50">頭</text>
+
+        <!-- 左侧寄信人地址线(抽象) -->
+        <g stroke="#2c1810" stroke-width="0.8" opacity="0.4" fill="none" stroke-linecap="round">
+          <line x1="20" y1="70" x2="42" y2="75"/>
+          <line x1="22" y1="82" x2="40" y2="88"/>
+          <line x1="18" y1="96" x2="44" y2="102"/>
+          <line x1="22" y1="112" x2="40" y2="118"/>
         </g>
-        <!-- 地址线条(装饰) -->
-        <line x1="55" y1="88" x2="145" y2="88" stroke="#8b1e15" stroke-width="0.6" opacity="0.25"/>
-        <line x1="55" y1="98" x2="130" y2="98" stroke="#8b1e15" stroke-width="0.6" opacity="0.25"/>
-        <line x1="55" y1="108" x2="140" y2="108" stroke="#8b1e15" stroke-width="0.6" opacity="0.25"/>
+
+        <!-- 右侧收信人地址线(抽象) -->
+        <g stroke="#2c1810" stroke-width="0.8" opacity="0.4" fill="none" stroke-linecap="round">
+          <line x1="108" y1="70" x2="130" y2="75"/>
+          <line x1="110" y1="82" x2="128" y2="88"/>
+          <line x1="106" y1="96" x2="132" y2="102"/>
+          <line x1="110" y1="112" x2="128" y2="118"/>
+        </g>
+
+        <!-- 右上角邮戳印记 -->
+        <circle cx="130" cy="56" r="6" fill="none" stroke="#8b1e15" stroke-width="1" opacity="0.55"/>
       </svg>
-      <!-- 朱红圆章盖印(动画) -->
-      <div class="envelope-seal">觀批</div>
     </div>
     <div class="envelope-msg">批 脚 送 信 中 …</div>
   </div>
@@ -3497,12 +3504,12 @@ function showToast(msg) {
 function showLoading(show) {
   const loading = $('loading');
   if (show) {
-    // 重置盖章动画,每次送信都重新盖一次
-    const seal = loading.querySelector('.envelope-seal');
-    if (seal) {
-      seal.style.animation = 'none';
-      void seal.offsetWidth; // force reflow
-      seal.style.animation = '';
+    // 重置信笺滑入动画,每次送信都重新装一次
+    const letter = loading.querySelector('.env-letter');
+    if (letter) {
+      // 通过重置 class 触发动画重播
+      loading.classList.remove('show');
+      void loading.offsetWidth; // force reflow
     }
   }
   loading.classList.toggle('show', show);
@@ -3527,7 +3534,7 @@ function doTranslate() {
     setTimeout(() => {
       output.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
-  }, 1300);
+  }, 1600);
 }
 
 function render(modern, result) {
@@ -3602,7 +3609,7 @@ function showDelivered() {
   d.classList.remove('show');
   void d.offsetWidth; // 强制 reflow 重启动画
   d.classList.add('show');
-  setTimeout(() => d.classList.remove('show'), 1800);
+  setTimeout(() => d.classList.remove('show'), 3000);
 }
 
 // Download image
