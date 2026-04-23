@@ -636,6 +636,80 @@
     50% { opacity: 1; }
   }
 
+  /* 批已送达 仪式 */
+  .delivered {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    pointer-events: none;
+  }
+  .delivered.show {
+    display: flex;
+    animation: deliveredOverlay 1.8s ease-out forwards;
+  }
+  @keyframes deliveredOverlay {
+    0% { background: rgba(20, 12, 6, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+    18% { background: rgba(20, 12, 6, 0.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+    82% { background: rgba(20, 12, 6, 0.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+    100% { background: rgba(20, 12, 6, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+  }
+  .delivered-content {
+    text-align: center;
+  }
+  .delivered-stamp {
+    width: 130px;
+    height: 130px;
+    border: 5px solid #b73329;
+    background: rgba(183, 51, 41, 0.12);
+    color: #b73329;
+    font-family: "STKaiti", "KaiTi", "楷体", serif;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    padding-left: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 2px rgba(183, 51, 41, 0.4), 0 4px 16px rgba(0,0,0,0.4);
+    margin: 0 auto;
+    opacity: 0;
+    transform: rotate(-60deg) scale(2.2);
+  }
+  .delivered.show .delivered-stamp {
+    animation: deliveredStamp 1.7s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards;
+  }
+  @keyframes deliveredStamp {
+    0%   { transform: rotate(-60deg) scale(2.2); opacity: 0; }
+    20%  { opacity: 1; }
+    38%  { transform: rotate(-8deg) scale(1.15); opacity: 1; }
+    52%  { transform: rotate(-14deg) scale(0.95); }
+    66%  { transform: rotate(-10deg) scale(1.03); opacity: 1; }
+    82%  { transform: rotate(-12deg) scale(1); opacity: 1; }
+    100% { transform: rotate(-12deg) scale(1); opacity: 0; }
+  }
+  .delivered-msg {
+    margin-top: 28px;
+    color: #c9a76e;
+    font-size: 16px;
+    letter-spacing: 10px;
+    padding-left: 10px;
+    opacity: 0;
+  }
+  .delivered.show .delivered-msg {
+    animation: deliveredMsg 1.7s ease-out forwards;
+  }
+  @keyframes deliveredMsg {
+    0% { opacity: 0; transform: translateY(8px); }
+    30% { opacity: 0; transform: translateY(8px); }
+    55% { opacity: 1; transform: translateY(0); }
+    82% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-4px); }
+  }
+
   /* Toast */
   .toast {
     position: fixed;
@@ -797,6 +871,13 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="delivered" id="delivered">
+  <div class="delivered-content">
+    <div class="delivered-stamp">已寄</div>
+    <div class="delivered-msg">批 已 送 達</div>
+  </div>
+</div>
 
 <script>/* html-to-image@1.11.11 (inlined) */
 /**
@@ -3515,6 +3596,15 @@ $('regenBtn').addEventListener('click', () => {
   }, 1100);
 });
 
+// 批已送达 仪式
+function showDelivered() {
+  const d = $('delivered');
+  d.classList.remove('show');
+  void d.offsetWidth; // 强制 reflow 重启动画
+  d.classList.add('show');
+  setTimeout(() => d.classList.remove('show'), 1800);
+}
+
 // Download image
 $('downloadBtn').addEventListener('click', async () => {
   const card = $('shareCard');
@@ -3532,12 +3622,13 @@ $('downloadBtn').addEventListener('click', async () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    showToast('图片已保存');
+    showLoading(false);
+    // 批已送达 仪式(替代原 toast)
+    showDelivered();
   } catch (err) {
     console.error(err);
-    showToast('保存失败,请长按图片保存');
-  } finally {
     showLoading(false);
+    showToast('保存失败,请长按图片保存');
   }
 });
 </script>
