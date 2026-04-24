@@ -263,6 +263,20 @@
     border-top: none;
   }
 
+  /* Cotton flower decoration (木棉花) */
+  .cotton-flower {
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    top: 24px;
+    left: 50%;
+    opacity: 0.85;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 3px rgba(139, 30, 21, 0.3));
+    z-index: 2;
+    transform: translateX(-50%) rotate(-12deg);
+  }
+
   .qiaopi-header {
     text-align: center;
     padding-bottom: 10px;
@@ -375,25 +389,37 @@
   }
 
   .ancient-text {
-    font-size: 16.5px;
-    line-height: 1.85;
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    font-size: 16px;
+    line-height: 1.9;
     color: var(--ink);
-    padding: 2px 4px 0;
-    text-indent: 2em;
+    padding: 14px 10px;
     white-space: pre-wrap;
     font-weight: 500;
+    height: 320px;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(
+        to left,
+        transparent 0,
+        transparent calc(1.9em - 0.5px),
+        rgba(183, 51, 41, 0.38) calc(1.9em - 0.5px),
+        rgba(183, 51, 41, 0.38) 1.9em
+      ),
+      rgba(255, 251, 243, 0.4);
+    border: 1.5px solid var(--red);
+    border-left-width: 3px;
+    border-right-width: 3px;
+    box-shadow: inset 0 0 0 1px rgba(255, 251, 243, 0.6);
+    text-align: justify;
   }
-  .ancient-text .opening {
-    display: block;
-    text-indent: 0;
-    font-weight: 700;
-    margin-bottom: 4px;
-    letter-spacing: 1px;
-  }
-  .ancient-text .body { display: block; }
+  .ancient-text .body,
   .ancient-text .closing {
-    display: block;
-    margin-top: 6px;
+    display: inline;
+  }
+  .ancient-text .closing {
+    font-weight: 600;
   }
 
   .signature-block {
@@ -455,6 +481,18 @@
     padding-left: 5px;
     margin-bottom: 4px;
     font-size: 12px;
+  }
+  .qiaopi-footer .slogan {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--red);
+    letter-spacing: 6px;
+    padding: 3px 14px 3px 20px;
+    margin: 4px 0 6px;
+    border-left: 2px solid var(--red);
+    border-right: 2px solid var(--red);
+    font-family: "STKaiti", "KaiTi", "楷体", serif;
   }
   .qiaopi-footer .subline {
     font-size: 10px;
@@ -745,6 +783,35 @@
 
   <section class="output" id="output">
     <div class="qiaopi-card" id="shareCard">
+      <svg class="cotton-flower" viewBox="0 0 60 60" aria-hidden="true">
+        <g transform="translate(30 30) rotate(-18)">
+          <g fill="#b73329">
+            <ellipse cx="0" cy="-14" rx="7.5" ry="14"/>
+            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(288)"/>
+          </g>
+          <g fill="#8b1e15" opacity="0.55">
+            <ellipse cx="0" cy="-20" rx="3" ry="5"/>
+            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(288)"/>
+          </g>
+          <g fill="#d4a942">
+            <circle cx="0" cy="-5.5" r="1"/>
+            <circle cx="3.5" cy="-4" r="1"/>
+            <circle cx="-3.5" cy="-4" r="1"/>
+            <circle cx="4.5" cy="0" r="1"/>
+            <circle cx="-4.5" cy="0" r="1"/>
+            <circle cx="2.5" cy="3.5" r="1"/>
+            <circle cx="-2.5" cy="3.5" r="1"/>
+            <circle cx="0" cy="4.5" r="1"/>
+          </g>
+          <circle r="2.8" fill="#8b1e15"/>
+        </g>
+      </svg>
       <div class="qiaopi-header">
         <div class="stamp-row">
           <div class="postmark" id="postmark">
@@ -779,6 +846,7 @@
 
       <div class="qiaopi-footer">
         <div class="movie-line">《給阿嬤的情書》</div>
+        <div class="slogan">平 安 當 大 賺</div>
         <div class="subline">見字即見影 · 一封觀影批 · 道盡千言萬語</div>
         <div class="qr-block">
           <img id="qrImg" alt="扫码写你自己的观影批">
