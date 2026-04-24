@@ -3551,12 +3551,19 @@ function showDelivered() {
 $('downloadBtn').addEventListener('click', async () => {
   const card = $('shareCard');
   showLoading(true);
+  const t0 = Date.now();
+  const MIN_LOADING = 1400; // 信封仪式至少展示 1.4s,避免 html-to-image 太快跳过
   try {
     const dataUrl = await htmlToImage.toPng(card, {
       pixelRatio: 2.5,
       backgroundColor: '#f3e7cf',
       cacheBust: true
     });
+    // 保证信封仪式完整展示
+    const elapsed = Date.now() - t0;
+    if (elapsed < MIN_LOADING) {
+      await new Promise(r => setTimeout(r, MIN_LOADING - elapsed));
+    }
     // Download
     const a = document.createElement('a');
     a.href = dataUrl;
@@ -3565,7 +3572,7 @@ $('downloadBtn').addEventListener('click', async () => {
     a.click();
     document.body.removeChild(a);
     showLoading(false);
-    // 批已送达 仪式(替代原 toast)
+    // 批已送达 仪式
     showDelivered();
   } catch (err) {
     console.error(err);
