@@ -578,38 +578,30 @@
   }
   .envelope-float {
     position: relative;
-    width: 150px;
-    height: 200px;
+    width: 200px;
+    height: 300px;
     margin: 0 auto;
-    animation: envFloat 3.2s ease-in-out infinite;
-    filter: drop-shadow(0 10px 26px rgba(0,0,0,0.6));
+    animation: envFloat 3.6s ease-in-out infinite;
+    filter: drop-shadow(0 14px 32px rgba(0,0,0,0.6));
   }
   @keyframes envFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.012); }
   }
-  .envelope-svg {
+  .envelope-img {
     width: 100%;
     height: 100%;
     display: block;
-    overflow: visible;
-  }
-  /* 信笺从信封上方滑入 */
-  .env-letter {
-    transform: translateY(-58px);
+    object-fit: contain;
     opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
+    transition: opacity 0.4s ease;
   }
-  .loading.show .env-letter {
-    animation: letterSlideIn 1.15s 0.35s cubic-bezier(0.25, 0.1, 0.25, 1.15) forwards;
+  .loading.show .envelope-img {
+    animation: envFadeIn 0.6s 0.1s ease-out forwards;
   }
-  @keyframes letterSlideIn {
-    0%   { transform: translateY(-58px); opacity: 0; }
-    25%  { transform: translateY(-58px); opacity: 1; }
-    78%  { transform: translateY(0); opacity: 1; }
-    88%  { transform: translateY(-2px); opacity: 1; }
-    100% { transform: translateY(0); opacity: 1; }
+  @keyframes envFadeIn {
+    0% { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
   }
   .envelope-msg {
     margin-top: 26px;
@@ -818,60 +810,7 @@
 <div class="loading" id="loading">
   <div class="envelope-scene">
     <div class="envelope-float">
-      <svg class="envelope-svg" viewBox="0 0 150 200" xmlns="http://www.w3.org/2000/svg">
-        <!-- 信笺 · 从信封上方滑入(先绘制,会被信封遮挡下半部分) -->
-        <g class="env-letter">
-          <rect x="22" y="8" width="106" height="70" fill="#faf2de" stroke="#8b1e15" stroke-width="0.6" rx="1"/>
-          <line x1="32" y1="22" x2="118" y2="22" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
-          <line x1="32" y1="32" x2="108" y2="32" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
-          <line x1="32" y1="42" x2="115" y2="42" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
-          <line x1="32" y1="52" x2="100" y2="52" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
-          <line x1="32" y1="62" x2="112" y2="62" stroke="#8b1e15" stroke-width="0.35" opacity="0.45"/>
-        </g>
-
-        <!-- 信封主体(米黄纸) -->
-        <rect x="4" y="50" width="142" height="146" fill="#f5eacd" stroke="#8b1e15" stroke-width="1.6"/>
-
-        <!-- 中央红带(侨批标志性特征) -->
-        <rect x="54" y="50" width="42" height="146" fill="#c93a2e"/>
-
-        <!-- 红带两侧细线 -->
-        <line x1="54" y1="50" x2="54" y2="196" stroke="#8b1e15" stroke-width="0.5" opacity="0.4"/>
-        <line x1="96" y1="50" x2="96" y2="196" stroke="#8b1e15" stroke-width="0.5" opacity="0.4"/>
-
-        <!-- 红带上抽象毛笔字(受信人名) -->
-        <g fill="#2c1810" opacity="0.85">
-          <rect x="68" y="78" width="14" height="3" rx="0.5"/>
-          <rect x="73" y="84" width="4" height="24" rx="0.5"/>
-          <rect x="65" y="105" width="20" height="3" rx="0.5"/>
-
-          <rect x="68" y="126" width="14" height="3" rx="0.5"/>
-          <rect x="73" y="132" width="4" height="22" rx="0.5"/>
-          <rect x="65" y="152" width="20" height="3" rx="0.5"/>
-
-          <rect x="70" y="170" width="10" height="3" rx="0.5"/>
-          <rect x="73" y="176" width="4" height="14" rx="0.5"/>
-        </g>
-
-        <!-- 左侧寄信人地址线(抽象) -->
-        <g stroke="#2c1810" stroke-width="0.8" opacity="0.4" fill="none" stroke-linecap="round">
-          <line x1="20" y1="70" x2="42" y2="75"/>
-          <line x1="22" y1="82" x2="40" y2="88"/>
-          <line x1="18" y1="96" x2="44" y2="102"/>
-          <line x1="22" y1="112" x2="40" y2="118"/>
-        </g>
-
-        <!-- 右侧收信人地址线(抽象) -->
-        <g stroke="#2c1810" stroke-width="0.8" opacity="0.4" fill="none" stroke-linecap="round">
-          <line x1="108" y1="70" x2="130" y2="75"/>
-          <line x1="110" y1="82" x2="128" y2="88"/>
-          <line x1="106" y1="96" x2="132" y2="102"/>
-          <line x1="110" y1="112" x2="128" y2="118"/>
-        </g>
-
-        <!-- 右上角邮戳印记 -->
-        <circle cx="130" cy="56" r="6" fill="none" stroke="#8b1e15" stroke-width="1" opacity="0.55"/>
-      </svg>
+      <img class="envelope-img" src="envelope.png" alt="观影批">
     </div>
     <div class="envelope-msg">批 脚 送 信 中 …</div>
   </div>
@@ -3504,13 +3443,9 @@ function showToast(msg) {
 function showLoading(show) {
   const loading = $('loading');
   if (show) {
-    // 重置信笺滑入动画,每次送信都重新装一次
-    const letter = loading.querySelector('.env-letter');
-    if (letter) {
-      // 通过重置 class 触发动画重播
-      loading.classList.remove('show');
-      void loading.offsetWidth; // force reflow
-    }
+    // 重置信封淡入动画,每次送信都重新浮现一次
+    loading.classList.remove('show');
+    void loading.offsetWidth; // force reflow
   }
   loading.classList.toggle('show', show);
 }
