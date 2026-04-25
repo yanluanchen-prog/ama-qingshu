@@ -247,13 +247,47 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Shareable card = letter sheet + tail strip */
-  /* Card is just a wrapper now — letter sheet provides everything */
+  /* Shareable card = original-text header + letter sheet */
   .qiaopi-card {
     width: 100%;
     max-width: 380px;
     margin: 0 auto;
     position: relative;
+  }
+
+  /* Modern-text source box above the letter — shows the user's original
+     casual prose so the saved/shared image makes the "translation" gag
+     legible. Clean modern type contrasts with the antique vertical card. */
+  .modern-source {
+    width: 100%;
+    margin: 0 0 14px;
+    padding: 13px 18px 15px;
+    background: #fbf6ec;
+    border: 1px solid #d8c397;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(44, 24, 16, 0.12);
+    box-sizing: border-box;
+  }
+  .modern-source-label {
+    font-size: 10.5px;
+    color: #8b1e15;
+    letter-spacing: 5px;
+    text-align: center;
+    margin-bottom: 9px;
+    padding-bottom: 8px;
+    font-weight: 600;
+    font-family: "LXGW WenKai TC", "STKaiti", serif;
+    border-bottom: 1px dashed #c9a76e;
+  }
+  .modern-source-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3a2419;
+    letter-spacing: 0.4px;
+    text-align: center;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
   }
 
   /* Letter sheet: letter.png (1135×1654) is rendered as an <img> so
@@ -800,6 +834,10 @@
 
   <section class="output" id="output">
     <div class="qiaopi-card" id="shareCard">
+      <div class="modern-source">
+        <div class="modern-source-label">观 影 所 感 · 白 话</div>
+        <div class="modern-source-text" id="modernSourceText"></div>
+      </div>
       <div class="letter-sheet">
         <img class="letter-bg" src="letter.png" alt="" crossorigin="anonymous">
         <img class="cotton-flower" src="cotton.png" alt="" crossorigin="anonymous">
@@ -3525,6 +3563,7 @@ if (backEditBtn) {
 
 function render(modern, result) {
   $('modernText').textContent = modern;
+  $('modernSourceText').textContent = modern;
   $('ancientText').innerHTML =
     `<span class="body">${result.body}</span>` +
     `<span class="closing">${result.closing}</span>`;
