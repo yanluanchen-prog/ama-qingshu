@@ -256,91 +256,102 @@
     position: relative;
   }
 
-  /* Letter sheet: letter.jpg fills container exactly, natural aspect preserved. */
+  /* Letter sheet: letter.png (1135×1654) is rendered as an <img> so
+     html-to-image reliably captures it (CSS background images are
+     unreliable in the SVG-foreignObject pipeline used for export). */
   .letter-sheet {
     position: relative;
     width: 100%;
-    aspect-ratio: 800 / 1328;
-    background: url('letter.jpg') center / 100% 100% no-repeat;
+    aspect-ratio: 1135 / 1654;
     filter:
       drop-shadow(0 12px 24px rgba(0,0,0,0.45))
       drop-shadow(0 22px 50px rgba(0,0,0,0.28));
   }
+  .letter-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 0;
+    user-select: none;
+    pointer-events: none;
+  }
 
-  /* Cotton flower at top-left, tucked inside the inner red frame */
+  /* Cotton flower bleeds slightly off the top-left corner of the paper —
+     larger than before, anchored to the corner like a wax seal. */
   .cotton-flower {
     position: absolute;
-    top: 1.5%;
-    left: 5.5%;
-    width: 18%;
-    transform: rotate(-12deg);
+    top: -3%;
+    left: -4%;
+    width: 22%;
+    transform: rotate(-14deg);
     filter: drop-shadow(0 2px 6px rgba(139, 30, 21, 0.28));
     pointer-events: none;
-    z-index: 2;
+    z-index: 3;
     user-select: none;
   }
 
-  /* Stamp at top-right, fully inside the top white strip (above the line divider) */
-  .stamp {
+  /* Big "觀影批" title runs vertically down the rightmost column,
+     functioning as both masthead and visual anchor. Replaces the small
+     stamp from the earlier design. */
+  .lp-title {
     position: absolute;
-    top: 6.5%;
-    right: 11%;
-    width: 11%;
-    aspect-ratio: 610 / 856;
-    background: url('stamp.webp') center/100% 100% no-repeat;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    top: 7%;
+    right: 7.5%;
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+    font-size: 44px;
+    font-weight: 900;
     color: var(--red-deep);
-    filter: drop-shadow(0 1px 2px rgba(44, 24, 16, 0.18));
+    letter-spacing: 14px;
     line-height: 1;
     z-index: 2;
+    text-shadow: 0 1px 0 rgba(255, 240, 220, 0.2);
   }
-  .stamp .s-label { font-size: 6px; font-weight: 700; }
-  .stamp .s-value { font-size: 9px; font-weight: 800; letter-spacing: 1px; margin: 2px 0; font-family: "STKaiti", "KaiTi", serif; }
-  .stamp .s-bottom { font-size: 5.5px; }
 
-  /* Vertical writing body — fills the lined area inside the inner red frame.
-     Larger font + tighter line-height makes the text fill more printed columns
-     and keeps it from running into the right border line. */
+  /* Vertical writing body — fills the columns to the LEFT of the title.
+     The first body column starts at ~22% from the right edge, leaving the
+     title its own column. Bottom inset leaves room for QR + caption. */
   .lp-body {
     position: absolute;
-    top: 23.5%;
-    bottom: 19%;
-    left: 7.5%;
-    right: 10.5%;
+    top: 8%;
+    bottom: 24%;
+    left: 9%;
+    right: 22%;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
-    font-size: 18px;
-    line-height: 1.65;
+    font-size: 19px;
+    line-height: 1.55;
     letter-spacing: 1px;
     color: var(--ink);
     white-space: pre-wrap;
     font-weight: 500;
     overflow: hidden;
     text-align: justify;
+    z-index: 1;
   }
   .lp-body .body,
   .lp-body .closing { display: inline; }
   .lp-body .closing { font-weight: 600; }
 
-  /* QR + caption sit at bottom-right INSIDE the inner red frame, on the bottom strip
-     between the lined area and the inner border. */
+  /* QR + caption now live in the BOTTOM-LEFT corner (per the new
+     reference). Caption is vertical and sits above the QR square. */
   .qr-block-on-letter {
     position: absolute;
-    right: 9%;
-    bottom: 8%;
+    left: 8%;
+    bottom: 6%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     gap: 8px;
     z-index: 2;
   }
   .qr-on-letter {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
     background: #fff;
     padding: 2px;
     border: 1.5px solid var(--red);
@@ -352,12 +363,12 @@
     height: 100%;
     display: block;
   }
-  /* Caption sits directly on the paper — uses the same Wenkai script as the body
-     for a consistent letter feel. */
   .scan-caption {
-    font-size: 10.5px;
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    font-size: 11px;
     color: var(--red-deep);
-    letter-spacing: 2px;
+    letter-spacing: 4px;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", serif;
     white-space: nowrap;
     font-weight: 700;
@@ -416,7 +427,9 @@
     line-height: 1.7;
   }
 
-  /* Loading overlay · 信封仪式 */
+  /* Loading overlay · 信封仪式
+     Backdrop AND envelope fade in together (driven by the same keyframe)
+     so users never see a black screen before the envelope appears. */
   .loading {
     position: fixed;
     inset: 0;
@@ -428,7 +441,14 @@
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
   }
-  .loading.show { display: flex; }
+  .loading.show {
+    display: flex;
+    animation: loadingFadeIn 0.35s ease-out forwards;
+  }
+  @keyframes loadingFadeIn {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
   .envelope-scene {
     position: relative;
     width: 220px;
@@ -453,14 +473,14 @@
     object-fit: cover;
     opacity: 0;
   }
-  /* Envelope picture and overlay text fade in TOGETHER as one unit, so users
-     never see a blank envelope before the title appears. */
+  /* Envelope picture and overlay text fade in together with the backdrop
+     (no delay) so the whole ceremony lands as one frame. */
   .loading.show .envelope-img,
   .loading.show .env-overlay {
-    animation: envFadeIn 0.7s 0.1s ease-out forwards;
+    animation: envFadeIn 0.35s ease-out forwards;
   }
   @keyframes envFadeIn {
-    0% { opacity: 0; transform: scale(0.92); }
+    0% { opacity: 0; transform: scale(0.96); }
     100% { opacity: 1; transform: scale(1); }
   }
 
@@ -696,15 +716,12 @@
   <section class="output" id="output">
     <div class="qiaopi-card" id="shareCard">
       <div class="letter-sheet">
-        <img class="cotton-flower" src="cotton.png" alt="">
-        <div class="stamp">
-          <div class="s-label">汕頭</div>
-          <div class="s-value">批信</div>
-          <div class="s-bottom">貳分</div>
-        </div>
+        <img class="letter-bg" src="letter.png" alt="" crossorigin="anonymous">
+        <img class="cotton-flower" src="cotton.png" alt="" crossorigin="anonymous">
+        <div class="lp-title">觀影批</div>
         <div class="lp-body" id="ancientText"></div>
         <div class="qr-block-on-letter">
-          <span class="scan-caption">扫一扫，写你自己的观影批</span>
+          <span class="scan-caption">扫码写你自己的观影批</span>
           <div class="qr-on-letter">
             <img id="qrImg" alt="掃碼寫你自己的觀影批">
           </div>
@@ -3491,24 +3508,35 @@ function showDelivered() {
   setTimeout(() => d.classList.remove('show'), 3000);
 }
 
-// Download image
+// Download image — keep this fast: render at 2x, no artificial delay,
+// and skip the 批已送達 ceremony (it added 3s of pure waiting before
+// the user saw their image).
 $('downloadBtn').addEventListener('click', async () => {
   const card = $('shareCard');
   showLoading(true);
-  const t0 = Date.now();
-  const MIN_LOADING = 1400; // 信封仪式至少展示 1.4s,避免 html-to-image 太快跳过
   try {
+    // Make sure all <img> children are decoded before snapshotting,
+    // otherwise html-to-image may produce a blank/partial card on
+    // first save (especially on slower phones / WeChat WebView).
+    const imgs = card.querySelectorAll('img');
+    await Promise.all(
+      Array.from(imgs).map((img) => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise((res) => {
+          img.addEventListener('load', res, { once: true });
+          img.addEventListener('error', res, { once: true });
+        });
+      })
+    );
     const dataUrl = await htmlToImage.toPng(card, {
-      pixelRatio: 2.5,
-      backgroundColor: '#f3e7cf',
-      cacheBust: true
+      pixelRatio: 3,
+      backgroundColor: null,
+      cacheBust: false,
+      // Skip font CSS embedding — Google Fonts / jsdelivr CSS is cross-origin
+      // and can't be read by the page; the library spends seconds failing to
+      // fetch it. The page already falls back to system Kaiti for export.
+      skipFonts: true
     });
-    // 保证信封仪式完整展示
-    const elapsed = Date.now() - t0;
-    if (elapsed < MIN_LOADING) {
-      await new Promise(r => setTimeout(r, MIN_LOADING - elapsed));
-    }
-    // Download
     const a = document.createElement('a');
     a.href = dataUrl;
     a.download = `侨批_${Date.now()}.png`;
@@ -3516,8 +3544,7 @@ $('downloadBtn').addEventListener('click', async () => {
     a.click();
     document.body.removeChild(a);
     showLoading(false);
-    // 批已送达 仪式
-    showDelivered();
+    showToast('已保存');
   } catch (err) {
     console.error(err);
     showLoading(false);
