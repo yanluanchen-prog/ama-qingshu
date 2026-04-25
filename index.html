@@ -258,11 +258,15 @@
 
   /* Letter sheet: letter.png (1135×1654) is rendered as an <img> so
      html-to-image reliably captures it (CSS background images are
-     unreliable in the SVG-foreignObject pipeline used for export). */
+     unreliable in the SVG-foreignObject pipeline used for export).
+     container-type makes 1cqw == 1% of letter-sheet width, so child
+     font-size and line-height can be expressed as exact percentages
+     of the printed column grid below. */
   .letter-sheet {
     position: relative;
     width: 100%;
     aspect-ratio: 1135 / 1654;
+    container-type: inline-size;
     filter:
       drop-shadow(0 12px 24px rgba(0,0,0,0.45))
       drop-shadow(0 22px 50px rgba(0,0,0,0.28));
@@ -292,20 +296,29 @@
     user-select: none;
   }
 
-  /* The printed paper has 8 columns between vertical lines. Detected line
-     centers (% of paper width):
-       outer-L 5.7 | 16.8 | 28.6 | 40.0 | 50.6 | 60.8 | 71.1 | 82.0 | outer-R 93.3
-     Each interior column is ~10.5–11.4% wide. Element insets below are
-     calibrated to those positions so text and decorations sit cleanly
-     INSIDE specific printed columns. */
+  /* The printed paper has 9 vertical lines = 8 columns. Line centers
+     (% of paper width, measured from letter.png):
+       5.7 | 16.8 | 28.6 | 40.0 | 50.6 | 60.8 | 71.1 | 82.0 | 93.3
+     Reading right-to-left, the columns are:
+       col1 82.0–93.3  |觀影批 title|
+       col2 71.1–82.0  ┐
+       col3 60.8–71.1  │
+       col4 50.6–60.8  ├ body text (6 cols, ~10.87% each)
+       col5 40.0–50.6  │
+       col6 28.6–40.0  │
+       col7 16.8–28.6  ┘
+       col8  5.7–16.8  | caption + QR (leftmost)
+     All sizes below are in cqw (% of letter-sheet width) so text
+     columns align with the printed lines on every screen size. */
 
-  /* "觀影批" title sits in column 1 (rightmost: 82.0% – 93.3%).
-     Uses the same brush-style Wenkai face as the body for consistency. */
+  /* 觀影批 title in col 1 (right edge of paper at 93.3%). The inner red
+     border sits at ~6.7% from the right, so right: 7.5% pulls the title
+     fully inside the border instead of bleeding past it. */
   .lp-title {
     position: absolute;
-    top: 6%;
-    right: 5.7%;
-    width: 11.3%;
+    top: 7%;
+    right: 7.5%;
+    width: 10cqw;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
@@ -313,33 +326,31 @@
     color: var(--red-deep);
     text-align: center;
     line-height: 1;
-    letter-spacing: 0.4em;
-    font-size: 7.6vw;
+    letter-spacing: 0.55em;
+    font-size: 8cqw;
     z-index: 2;
     text-shadow: 0 1px 0 rgba(255, 240, 220, 0.2);
     white-space: nowrap;
   }
-  /* Cap title size on wider screens so it never exceeds its column. */
-  @media (min-width: 480px) {
-    .lp-title { font-size: 36px; }
-  }
 
-  /* Body text fills columns 2–6 (16.8% – 71.1%). Column 7 holds the QR
-     caption and column 8 holds the QR itself. line-height in vertical-rl
-     mode controls the gap BETWEEN text columns, so it's tuned to match
-     the printed column width (~10.6% of card width). */
+  /* Body text fills cols 2–7 (16.8% to 82.0% = 65.2% wide, 6 cols of
+     ~10.87% each). The user wanted wider visual spacing between text
+     columns, so font is bumped up to 8cqw and line-height to 1.4 — that
+     gives a column-to-column distance of 11.2cqw, slightly wider than
+     the average printed column so each text column sits inside its
+     printed neighbor with a touch of breathing room. */
   .lp-body {
     position: absolute;
-    top: 6%;
+    top: 7%;
     bottom: 6%;
-    left: 28.9%;
-    right: 16.8%;
+    left: 18.8%;
+    right: 18%;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
-    font-size: 7.4vw;
-    line-height: 1.42;
-    letter-spacing: 0.05em;
+    font-size: 8cqw;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
     color: var(--ink);
     white-space: pre-wrap;
     font-weight: 500;
@@ -347,43 +358,36 @@
     text-align: justify;
     z-index: 1;
   }
-  @media (min-width: 480px) {
-    .lp-body { font-size: 30px; }
-  }
   .lp-body .body,
   .lp-body .closing { display: inline; }
   .lp-body .closing { font-weight: 600; }
 
-  /* Caption "扫码写你自己的观影批" lives in column 7 (16.8% – 28.6%),
-     vertical text running top-to-bottom. */
+  /* Caption sits in col 8 (leftmost), shifted DOWN and pushed flush
+     against the inner border. Centred horizontally inside col 8 via
+     a fixed-width wrapper. */
   .scan-caption {
     position: absolute;
-    top: 28%;
-    bottom: 14%;
-    left: 16.8%;
-    width: 11.8%;
+    top: 32%;
+    left: 6%;
+    width: 4cqw;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     color: var(--red-deep);
     letter-spacing: 0.3em;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", serif;
     font-weight: 700;
-    text-align: center;
-    line-height: 1.2;
-    font-size: 4vw;
+    line-height: 1;
+    font-size: 3.4cqw;
     z-index: 2;
-  }
-  @media (min-width: 480px) {
-    .scan-caption { font-size: 16px; }
+    white-space: nowrap;
   }
 
-  /* QR sits inside column 8 (5.7% – 16.8%), tucked at the bottom.
-     Width tracks the column so it always fits regardless of card size. */
+  /* QR also lives in col 8, pinned to the bottom-left. */
   .qr-on-letter {
     position: absolute;
-    left: 6.7%;
+    left: 7%;
     bottom: 6%;
-    width: 9%;
+    width: 8cqw;
     aspect-ratio: 1 / 1;
     background: #fff;
     padding: 2px;
