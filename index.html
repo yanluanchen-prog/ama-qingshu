@@ -6,6 +6,11 @@
 <meta name="format-detection" content="telephone=no">
 <title>观影批 · 给阿嬷的情书</title>
 <meta name="description" content="看完电影《给阿嬷的情书》,把你的观后感写成一封旧时侨批。一封观影批,替你道尽千言万语。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-tc-webfont@1.7.0/style.css">
 <style>
   :root {
     --paper: #f3e7cf;
@@ -28,7 +33,7 @@
       radial-gradient(circle at 80% 100%, #2a1a10 0%, transparent 40%),
       #1f130a;
     color: var(--ink);
-    font-family: "KaiTi", "STKaiti", "楷体", "SimKai", "FangSong", "仿宋", "思源宋体", "Source Han Serif SC", "Noto Serif SC", serif;
+    font-family: "LXGW WenKai TC", "LXGW WenKai", "Noto Serif SC", "思源宋体", "Source Han Serif SC", "KaiTi", "STKaiti", "楷体", "FangSong", "仿宋", serif;
     font-size: 16px;
     line-height: 1.8;
     overflow-x: hidden;
@@ -216,6 +221,28 @@
   }
   .output.show { display: block; }
 
+  /* Translated mode: hide modern text + divider so letter paper dominates (单屏效果) */
+  body.translated .input-card { display: none; }
+  body.translated .qiaopi-card .compare-block:has(.modern-text) { display: none; }
+  body.translated .qiaopi-card .divider-classic { display: none; }
+  body.translated .masthead { display: none; }
+  .back-edit {
+    display: none;
+    background: none;
+    border: 1px solid rgba(201, 167, 110, 0.4);
+    color: #c9a76e;
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin: 16px auto 0;
+    cursor: pointer;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.translated .back-edit { display: block; }
+  .back-edit:active { transform: translateY(1px); }
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -388,38 +415,51 @@
     letter-spacing: 2px;
   }
 
-  .ancient-text {
+  /* Letter paper (信纸) — background image provides paper, frame, grid, 觀影批 brand */
+  .letter-paper {
+    position: relative;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 2px;
+    aspect-ratio: 704 / 1520;
+    max-width: 260px;
+    margin: 0 auto;
+    padding: 18% 14% 18% 30%;
+    overflow: hidden;
+    background: url('letter.png') center/100% 100% no-repeat;
+  }
+
+  .lp-title {
+    display: none;
+  }
+
+  .lp-body {
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
-    font-size: 16px;
-    line-height: 1.9;
+    font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
+    font-size: 14px;
+    line-height: 2.0;
+    letter-spacing: 1px;
     color: var(--ink);
-    padding: 14px 10px;
+    padding: 0;
     white-space: pre-wrap;
     font-weight: 500;
-    height: 320px;
+    flex: 1;
+    min-width: 0;
     overflow: hidden;
-    background:
-      repeating-linear-gradient(
-        to left,
-        transparent 0,
-        transparent calc(1.9em - 0.5px),
-        rgba(183, 51, 41, 0.38) calc(1.9em - 0.5px),
-        rgba(183, 51, 41, 0.38) 1.9em
-      ),
-      rgba(255, 251, 243, 0.4);
-    border: 1.5px solid var(--red);
-    border-left-width: 3px;
-    border-right-width: 3px;
-    box-shadow: inset 0 0 0 1px rgba(255, 251, 243, 0.6);
     text-align: justify;
+    background: none;
   }
-  .ancient-text .body,
-  .ancient-text .closing {
+  .lp-body .body,
+  .lp-body .closing {
     display: inline;
   }
-  .ancient-text .closing {
+  .lp-body .closing {
     font-weight: 600;
+  }
+
+  .lp-brand {
+    display: none;
   }
 
   .signature-block {
@@ -616,8 +656,8 @@
   }
   .envelope-float {
     position: relative;
-    width: 200px;
-    height: 300px;
+    width: 175px;
+    height: 378px;
     margin: 0 auto;
     animation: envFloat 3.6s ease-in-out infinite;
     filter: drop-shadow(0 14px 32px rgba(0,0,0,0.6));
@@ -630,7 +670,7 @@
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
     opacity: 0;
     transition: opacity 0.4s ease;
   }
@@ -640,6 +680,88 @@
   @keyframes envFadeIn {
     0% { opacity: 0; transform: scale(0.92); }
     100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Envelope overlay text (观影批 etc on the red stripe) */
+  .env-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .loading.show .env-overlay {
+    animation: envFadeIn 0.8s 0.45s ease-out forwards;
+  }
+  .env-title-wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .env-title {
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    font-family: "Ma Shan Zheng", "LXGW WenKai TC", "STKaiti", serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: #1a0a05;
+    letter-spacing: 10px;
+    text-shadow: 0 1px 0 rgba(255, 240, 220, 0.15);
+  }
+  .env-sub {
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    font-family: "LXGW WenKai TC", "STKaiti", serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #1a0a05;
+    letter-spacing: 4px;
+    padding-top: 14px;
+    opacity: 0.82;
+  }
+  .env-side {
+    position: absolute;
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    font-family: "LXGW WenKai TC", "STKaiti", serif;
+    font-size: 9.5px;
+    color: #6b1811;
+    letter-spacing: 4px;
+    font-weight: 600;
+  }
+  .env-side-left {
+    top: 8%;
+    left: 6%;
+  }
+  .env-side-right {
+    bottom: 8%;
+    right: 6%;
+  }
+  .env-stamp {
+    position: absolute;
+    top: 7%;
+    right: 7%;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid #8b1e15;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "LXGW WenKai TC", "STKaiti", serif;
+    font-size: 9px;
+    font-weight: 800;
+    color: #8b1e15;
+    letter-spacing: 1px;
+    line-height: 1;
+    opacity: 0.82;
+    transform: rotate(-8deg);
+    writing-mode: vertical-rl;
   }
   .envelope-msg {
     margin-top: 26px;
@@ -752,7 +874,7 @@
   @media (max-width: 380px) {
     .masthead h1 { font-size: 32px; }
     .qiaopi-card { padding: 22px 18px; }
-    .ancient-text { font-size: 16.5px; }
+    .lp-body { font-size: 13px; }
   }
 </style>
 </head>
@@ -841,12 +963,15 @@
 
       <div class="compare-block">
         <div class="col-label">若書於舊時</div>
-        <div class="ancient-text" id="ancientText"></div>
+        <div class="letter-paper">
+          <div class="lp-title">觀影批</div>
+          <div class="lp-body" id="ancientText"></div>
+          <div class="lp-brand">平安當大賺</div>
+        </div>
       </div>
 
       <div class="qiaopi-footer">
         <div class="movie-line">《給阿嬤的情書》</div>
-        <div class="slogan">平 安 當 大 賺</div>
         <div class="subline">見字即見影 · 一封觀影批 · 道盡千言萬語</div>
         <div class="qr-block">
           <img id="qrImg" alt="扫码写你自己的观影批">
@@ -866,6 +991,8 @@
       <button id="regenBtn">再 翻 一 版</button>
       <button id="downloadBtn" class="primary">保 存 图 片</button>
     </div>
+
+    <button class="back-edit" id="backEditBtn">重 新 書 寫</button>
   </section>
 
   <footer class="app-footer">
@@ -879,6 +1006,15 @@
   <div class="envelope-scene">
     <div class="envelope-float">
       <img class="envelope-img" src="envelope.png" alt="观影批">
+      <div class="env-overlay">
+        <div class="env-side env-side-left">汕頭寄</div>
+        <div class="env-title-wrap">
+          <div class="env-title">觀影批</div>
+          <div class="env-sub">給阿嬤的情書</div>
+        </div>
+        <div class="env-side env-side-right">平安當大賺</div>
+        <div class="env-stamp">汕頭</div>
+      </div>
     </div>
     <div class="envelope-msg">批 脚 送 信 中 …</div>
   </div>
@@ -3534,10 +3670,22 @@ function doTranslate() {
     render(text, result);
     showLoading(false);
     output.classList.add('show');
+    document.body.classList.add('translated');
     setTimeout(() => {
-      output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 100);
   }, 1600);
+}
+
+const backEditBtn = $('backEditBtn');
+if (backEditBtn) {
+  backEditBtn.addEventListener('click', () => {
+    document.body.classList.remove('translated');
+    setTimeout(() => {
+      document.querySelector('.input-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      input.focus();
+    }, 80);
+  });
 }
 
 function render(modern, result) {
