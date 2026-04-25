@@ -255,35 +255,60 @@
     position: relative;
   }
 
-  /* Modern-text source box above the letter — shows the user's original
-     casual prose so the saved/shared image makes the "translation" gag
-     legible. Clean modern type contrasts with the antique vertical card. */
+  /* Snapshot-only layout. The on-screen page stays unchanged — these
+     styles only kick in when downloadBtn adds .snapshotting before
+     html-to-image grabs the card. Goal: a unified "translation
+     document" — modern transcript on top, qiaopi letter below,
+     framed in a single warm panel so the saved PNG reads as one
+     designed artifact instead of two stacked rectangles. */
+  .qiaopi-card.snapshotting {
+    background: linear-gradient(180deg, #2a160d 0%, #1a0a05 100%);
+    padding: 22px 16px 22px;
+    max-width: 400px;
+  }
+  .qiaopi-card.snapshotting .letter-sheet {
+    filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));
+  }
   .modern-source {
+    display: none;
+    position: relative;
     width: 100%;
-    margin: 0 0 14px;
-    padding: 13px 18px 15px;
-    background: #fbf6ec;
-    border: 1px solid #d8c397;
-    border-radius: 3px;
-    box-shadow: 0 2px 8px rgba(44, 24, 16, 0.12);
+    margin: 0 0 22px;
+    padding: 18px 22px 20px;
+    background: #f5e9c8;
+    border: 1px solid #b88a4f;
     box-sizing: border-box;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .qiaopi-card.snapshotting .modern-source { display: block; }
+  .modern-source::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 11px solid #b88a4f;
   }
   .modern-source-label {
-    font-size: 10.5px;
+    font-size: 11px;
     color: #8b1e15;
-    letter-spacing: 5px;
+    letter-spacing: 6px;
     text-align: center;
-    margin-bottom: 9px;
-    padding-bottom: 8px;
-    font-weight: 600;
+    margin-bottom: 11px;
+    padding-bottom: 9px;
+    font-weight: 700;
     font-family: "LXGW WenKai TC", "STKaiti", serif;
-    border-bottom: 1px dashed #c9a76e;
+    border-bottom: 1px dashed #b88a4f;
   }
   .modern-source-text {
     font-size: 14px;
-    line-height: 1.7;
-    color: #3a2419;
-    letter-spacing: 0.4px;
+    line-height: 1.75;
+    color: #2a1e15;
+    letter-spacing: 0.5px;
     text-align: center;
     white-space: pre-wrap;
     word-break: break-word;
@@ -3643,6 +3668,9 @@ function showDelivered() {
 $('downloadBtn').addEventListener('click', async () => {
   const card = $('shareCard');
   showLoading(true);
+  // .snapshotting reveals the modern-source header and switches the card
+  // into the framed share layout. Loading overlay hides the toggle.
+  card.classList.add('snapshotting');
   try {
     const imgs = card.querySelectorAll('img');
     await Promise.all(
@@ -3656,11 +3684,10 @@ $('downloadBtn').addEventListener('click', async () => {
     );
     const dataUrl = await htmlToImage.toPng(card, {
       pixelRatio: 3,
-      backgroundColor: '#ffffff',
+      backgroundColor: '#1a0a05',
       cacheBust: false,
       skipFonts: true
     });
-    showLoading(false);
     const previewImg = $('savePreviewImg');
     previewImg.src = dataUrl;
     const overlay = $('savePreview');
@@ -3668,8 +3695,10 @@ $('downloadBtn').addEventListener('click', async () => {
     overlay.classList.add('show');
   } catch (err) {
     console.error(err);
-    showLoading(false);
     showToast('生成失败,请重试');
+  } finally {
+    card.classList.remove('snapshotting');
+    showLoading(false);
   }
 });
 
