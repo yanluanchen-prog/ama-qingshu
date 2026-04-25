@@ -267,12 +267,12 @@
       drop-shadow(0 22px 50px rgba(0,0,0,0.28));
   }
 
-  /* Cotton flower at top-left (replaces postmark) */
+  /* Cotton flower at top-left, tucked inside the inner red frame */
   .cotton-flower {
     position: absolute;
-    top: 0%;
-    left: 4%;
-    width: 22%;
+    top: 1.5%;
+    left: 5.5%;
+    width: 18%;
     transform: rotate(-12deg);
     filter: drop-shadow(0 2px 6px rgba(139, 30, 21, 0.28));
     pointer-events: none;
@@ -280,12 +280,12 @@
     user-select: none;
   }
 
-  /* Stamp at top-right, slightly inward */
+  /* Stamp at top-right, fully inside the top white strip (above the line divider) */
   .stamp {
     position: absolute;
-    top: 4.5%;
-    right: 9%;
-    width: 13%;
+    top: 6.5%;
+    right: 11%;
+    width: 11%;
     aspect-ratio: 610 / 856;
     background: url('stamp.webp') center/100% 100% no-repeat;
     display: flex;
@@ -297,23 +297,24 @@
     line-height: 1;
     z-index: 2;
   }
-  .stamp .s-label { font-size: 7px; font-weight: 700; }
-  .stamp .s-value { font-size: 10px; font-weight: 800; letter-spacing: 1px; margin: 2px 0; font-family: "STKaiti", "KaiTi", serif; }
-  .stamp .s-bottom { font-size: 6.5px; }
+  .stamp .s-label { font-size: 6px; font-weight: 700; }
+  .stamp .s-value { font-size: 9px; font-weight: 800; letter-spacing: 1px; margin: 2px 0; font-family: "STKaiti", "KaiTi", serif; }
+  .stamp .s-bottom { font-size: 5.5px; }
 
-  /* Vertical writing body — kept strictly inside the inner red frame.
-     line-height is tuned so each text column aligns with the grid lines drawn in letter.jpg */
+  /* Vertical writing body — fills the lined area inside the inner red frame.
+     Larger font + tighter line-height makes the text fill more printed columns
+     and keeps it from running into the right border line. */
   .lp-body {
     position: absolute;
-    top: 22%;
-    bottom: 18%;
-    left: 11%;
-    right: 11%;
+    top: 23.5%;
+    bottom: 19%;
+    left: 7.5%;
+    right: 10.5%;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
-    font-size: 13px;
-    line-height: 2.06;
+    font-size: 18px;
+    line-height: 1.65;
     letter-spacing: 1px;
     color: var(--ink);
     white-space: pre-wrap;
@@ -325,12 +326,12 @@
   .lp-body .closing { display: inline; }
   .lp-body .closing { font-weight: 600; }
 
-  /* QR + caption side-by-side at bottom-right, sitting in the strip below the inner red frame.
-     Caption sits directly on the paper (no background pad). */
+  /* QR + caption sit at bottom-right INSIDE the inner red frame, on the bottom strip
+     between the lined area and the inner border. */
   .qr-block-on-letter {
     position: absolute;
-    right: 7%;
-    bottom: 3%;
+    right: 9%;
+    bottom: 8%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -338,8 +339,8 @@
     z-index: 2;
   }
   .qr-on-letter {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     background: #fff;
     padding: 2px;
     border: 1.5px solid var(--red);
@@ -351,13 +352,13 @@
     height: 100%;
     display: block;
   }
-  /* Caption sits directly on the paper — letter.jpg has been edited to remove
-     the original "A letter after the film" text, so no masking needed here. */
+  /* Caption sits directly on the paper — uses the same Wenkai script as the body
+     for a consistent letter feel. */
   .scan-caption {
-    font-size: 9.5px;
+    font-size: 10.5px;
     color: var(--red-deep);
-    letter-spacing: 1.5px;
-    font-family: "STKaiti", "KaiTi", "楷体", serif;
+    letter-spacing: 2px;
+    font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", serif;
     white-space: nowrap;
     font-weight: 700;
   }
@@ -451,10 +452,12 @@
     display: block;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 0.4s ease;
   }
-  .loading.show .envelope-img {
-    animation: envFadeIn 0.6s 0.1s ease-out forwards;
+  /* Envelope picture and overlay text fade in TOGETHER as one unit, so users
+     never see a blank envelope before the title appears. */
+  .loading.show .envelope-img,
+  .loading.show .env-overlay {
+    animation: envFadeIn 0.7s 0.1s ease-out forwards;
   }
   @keyframes envFadeIn {
     0% { opacity: 0; transform: scale(0.92); }
@@ -467,10 +470,6 @@
     inset: 0;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  .loading.show .env-overlay {
-    animation: envFadeIn 0.8s 0.45s ease-out forwards;
   }
   .env-title-wrap {
     position: absolute;
@@ -482,36 +481,46 @@
     align-items: flex-start;
     gap: 6px;
   }
+  /* Use a Songti / Serif stack so each character renders as a uniform-weight,
+     stamp-block glyph instead of the variable brush sizing of Ma Shan Zheng. */
   .env-title {
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
-    font-family: "Ma Shan Zheng", "LXGW WenKai TC", "STKaiti", serif;
-    font-size: 40px;
+    font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "STKaiti", serif;
+    font-size: 36px;
     font-weight: 900;
     color: #1a0a05;
-    letter-spacing: 10px;
+    letter-spacing: 6px;
+    line-height: 1;
     text-shadow: 0 1px 0 rgba(255, 240, 220, 0.15);
+  }
+  .env-title > span {
+    display: inline-block;
+    height: 42px;
+    width: 36px;
+    text-align: center;
+    line-height: 42px;
   }
   .env-sub {
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
-    font-family: "LXGW WenKai TC", "STKaiti", serif;
-    font-size: 10.5px;
+    font-family: "Noto Serif SC", "STSong", "STKaiti", serif;
+    font-size: 11px;
     font-weight: 700;
     color: #1a0a05;
-    letter-spacing: 4px;
-    padding-top: 14px;
+    letter-spacing: 3px;
+    padding-top: 10px;
     opacity: 0.82;
   }
   .env-side {
     position: absolute;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
-    font-family: "LXGW WenKai TC", "STKaiti", serif;
-    font-size: 9.5px;
+    font-family: "Noto Serif SC", "STSong", "STKaiti", serif;
+    font-size: 10px;
     color: #6b1811;
     letter-spacing: 4px;
-    font-weight: 600;
+    font-weight: 700;
   }
   .env-side-left {
     top: 8%;
@@ -652,7 +661,7 @@
 
   @media (max-width: 380px) {
     .masthead h1 { font-size: 32px; }
-    .lp-body { font-size: 13px; line-height: 1.9; }
+    .lp-body { font-size: 17px; line-height: 1.65; }
     .tail-movie { font-size: 12.5px; letter-spacing: 3px; }
     .tail-sub { font-size: 10px; }
     .qr-mini { width: 52px; height: 52px; }
@@ -729,7 +738,7 @@
       <div class="env-overlay">
         <div class="env-side env-side-left">汕頭寄</div>
         <div class="env-title-wrap">
-          <div class="env-title">觀影批</div>
+          <div class="env-title"><span>觀</span><span>影</span><span>批</span></div>
           <div class="env-sub">給阿嬤的情書</div>
         </div>
         <div class="env-side env-side-right">平安當大賺</div>
