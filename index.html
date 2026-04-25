@@ -326,6 +326,9 @@
     width: 100%;
     aspect-ratio: 1135 / 1654;
     container-type: inline-size;
+    /* Fallback paper color in case letter.png doesn't survive the
+       html-to-image snapshot — keeps the qiaopi text legible. */
+    background: #f4e6c4;
     filter:
       drop-shadow(0 12px 24px rgba(0,0,0,0.45))
       drop-shadow(0 22px 50px rgba(0,0,0,0.28));
@@ -860,7 +863,7 @@
   <section class="output" id="output">
     <div class="qiaopi-card" id="shareCard">
       <div class="modern-source">
-        <div class="modern-source-label">观 影 所 感 · 白 话</div>
+        <div class="modern-source-label">观 影 所 感</div>
         <div class="modern-source-text" id="modernSourceText"></div>
       </div>
       <div class="letter-sheet">
