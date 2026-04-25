@@ -215,17 +215,16 @@
 
   /* Output card -- this is the shareable qiaopi */
   .output {
-    margin-top: 28px;
+    margin-top: 22px;
     display: none;
     animation: fadeIn 0.6s ease;
   }
   .output.show { display: block; }
 
-  /* Translated mode: hide modern text + divider so letter paper dominates (单屏效果) */
   body.translated .input-card { display: none; }
-  body.translated .qiaopi-card .compare-block:has(.modern-text) { display: none; }
-  body.translated .qiaopi-card .divider-classic { display: none; }
   body.translated .masthead { display: none; }
+  body.translated .app-footer { display: none; }
+
   .back-edit {
     display: none;
     background: none;
@@ -235,7 +234,7 @@
     letter-spacing: 3px;
     padding: 6px 16px;
     border-radius: 2px;
-    margin: 16px auto 0;
+    margin: 10px auto 0;
     cursor: pointer;
     font-family: inherit;
     -webkit-tap-highlight-color: transparent;
@@ -248,334 +247,119 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* Shareable card = letter sheet + tail strip */
+  /* Card is just a wrapper now — letter sheet provides everything */
   .qiaopi-card {
-    background: var(--paper);
-    background-image:
-      radial-gradient(circle at 25% 30%, rgba(139, 30, 21, 0.04) 0%, transparent 50%),
-      radial-gradient(circle at 75% 70%, rgba(139, 30, 21, 0.03) 0%, transparent 50%),
-      repeating-linear-gradient(
-        to right,
-        transparent 0,
-        transparent calc(100% / 14 - 1px),
-        var(--line) calc(100% / 14 - 1px),
-        var(--line) calc(100% / 14)
-      );
-    border: 2px solid var(--red-deep);
-    box-shadow:
-      inset 0 0 0 4px var(--paper),
-      inset 0 0 0 5px var(--red),
-      0 8px 30px rgba(0,0,0,0.4),
-      0 30px 60px rgba(0,0,0,0.3);
-    padding: 20px 18px;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
     position: relative;
   }
 
-  /* Decoration corners */
-  .qiaopi-card::before, .qiaopi-card::after {
-    content: "";
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--red);
-    opacity: 0.5;
-  }
-  .qiaopi-card::before {
-    top: 10px; left: 10px;
-    border-right: none;
-    border-bottom: none;
-  }
-  .qiaopi-card::after {
-    bottom: 10px; right: 10px;
-    border-left: none;
-    border-top: none;
+  /* Letter sheet: letter.jpg fills container exactly, natural aspect preserved. */
+  .letter-sheet {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 800 / 1328;
+    background: url('letter.jpg') center / 100% 100% no-repeat;
+    filter:
+      drop-shadow(0 12px 24px rgba(0,0,0,0.45))
+      drop-shadow(0 22px 50px rgba(0,0,0,0.28));
   }
 
-  /* Cotton flower decoration (木棉花) */
+  /* Cotton flower at top-left (replaces postmark) */
   .cotton-flower {
     position: absolute;
-    width: 38px;
-    height: 38px;
-    top: 24px;
-    left: 50%;
-    opacity: 0.85;
+    top: 0%;
+    left: 4%;
+    width: 22%;
+    transform: rotate(-12deg);
+    filter: drop-shadow(0 2px 6px rgba(139, 30, 21, 0.28));
     pointer-events: none;
-    filter: drop-shadow(0 1px 3px rgba(139, 30, 21, 0.3));
     z-index: 2;
-    transform: translateX(-50%) rotate(-12deg);
+    user-select: none;
   }
 
-  .qiaopi-header {
-    text-align: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 12px;
-  }
-  .qiaopi-header .stamp-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .postmark {
-    width: 56px; height: 56px;
-    border: 2px solid var(--red);
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    color: var(--red);
-    line-height: 1.1;
-    transform: rotate(-14deg);
-    opacity: 0.82;
-    letter-spacing: 0;
-    padding: 2px;
-    font-family: "STKaiti", "KaiTi", serif;
-  }
-  .postmark .mark-top { font-size: 10px; font-weight: 700; }
-  .postmark .mark-mid { font-size: 12px; font-weight: 800; margin: 1px 0; }
-  .postmark .mark-bot { font-size: 8px; }
-
+  /* Stamp at top-right, slightly inward */
   .stamp {
-    width: 46px; height: 58px;
-    background:
-      repeating-linear-gradient(0deg,
-        transparent 0, transparent 3px,
-        #f3e7cf 3px, #f3e7cf 5px),
-      linear-gradient(135deg, #d4b896, #c9a76e);
-    border: 2px dashed rgba(139, 30, 21, 0.3);
+    position: absolute;
+    top: 4.5%;
+    right: 9%;
+    width: 13%;
+    aspect-ratio: 610 / 856;
+    background: url('stamp.webp') center/100% 100% no-repeat;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
     color: var(--red-deep);
-    position: relative;
+    filter: drop-shadow(0 1px 2px rgba(44, 24, 16, 0.18));
+    line-height: 1;
+    z-index: 2;
   }
-  .stamp .s-label { font-size: 8px; margin-bottom: 2px; }
-  .stamp .s-value { font-size: 14px; font-weight: 800; letter-spacing: 1px; }
-  .stamp .s-bottom { font-size: 7px; margin-top: 2px; }
+  .stamp .s-label { font-size: 7px; font-weight: 700; }
+  .stamp .s-value { font-size: 10px; font-weight: 800; letter-spacing: 1px; margin: 2px 0; font-family: "STKaiti", "KaiTi", serif; }
+  .stamp .s-bottom { font-size: 6.5px; }
 
-  .qiaopi-title {
-    font-size: 11px;
-    letter-spacing: 6px;
-    color: var(--ink-light);
-    padding-left: 6px;
-  }
-
-  /* Comparison layout: modern vs ancient */
-  .compare-block {
-    margin-bottom: 12px;
-  }
-  .compare-block .col-label {
-    font-size: 11px;
-    color: var(--red-deep);
-    letter-spacing: 4px;
-    padding-left: 4px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .compare-block .col-label::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: var(--line);
-  }
-
-  .modern-text {
-    font-family: "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-    font-size: 14.5px;
-    line-height: 1.75;
-    color: var(--ink-light);
-    padding: 6px 4px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 2px;
-  }
-
-  .divider-classic {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 14px 0 10px;
-    color: var(--red);
-    opacity: 0.7;
-  }
-  .divider-classic .line {
-    flex: 1;
-    height: 1px;
-    background: var(--red);
-    opacity: 0.4;
-  }
-  .divider-classic .mark {
-    font-size: 14px;
-    letter-spacing: 2px;
-  }
-
-  /* Letter paper (信纸) — background image provides paper, frame, grid, 觀影批 brand */
-  .letter-paper {
-    position: relative;
-    display: flex;
-    flex-direction: row-reverse;
-    gap: 2px;
-    aspect-ratio: 704 / 1520;
-    max-width: 260px;
-    margin: 0 auto;
-    padding: 18% 14% 18% 30%;
-    overflow: hidden;
-    background: url('letter.png') center/100% 100% no-repeat;
-  }
-
-  .lp-title {
-    display: none;
-  }
-
+  /* Vertical writing body — kept strictly inside the inner red frame.
+     line-height is tuned so each text column aligns with the grid lines drawn in letter.jpg */
   .lp-body {
+    position: absolute;
+    top: 22%;
+    bottom: 18%;
+    left: 11%;
+    right: 11%;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
-    font-size: 14px;
-    line-height: 2.0;
+    font-size: 13px;
+    line-height: 2.06;
     letter-spacing: 1px;
     color: var(--ink);
-    padding: 0;
     white-space: pre-wrap;
     font-weight: 500;
-    flex: 1;
-    min-width: 0;
     overflow: hidden;
     text-align: justify;
-    background: none;
   }
   .lp-body .body,
-  .lp-body .closing {
-    display: inline;
-  }
-  .lp-body .closing {
-    font-weight: 600;
-  }
+  .lp-body .closing { display: inline; }
+  .lp-body .closing { font-weight: 600; }
 
-  .lp-brand {
-    display: none;
-  }
-
-  .signature-block {
-    text-align: right;
-    margin-top: 20px;
-    padding-right: 8px;
-    position: relative;
-  }
-  .signature-block .sig {
-    font-size: 14.5px;
-    color: var(--ink);
-    line-height: 1.9;
-  }
-  .signature-block .date {
-    font-size: 13px;
-    color: var(--ink-light);
-    margin-top: 2px;
-  }
-
-  .seal {
+  /* QR + caption side-by-side at bottom-right, sitting in the strip below the inner red frame.
+     Caption sits directly on the paper (no background pad). */
+  .qr-block-on-letter {
     position: absolute;
-    right: 6px;
-    top: -8px;
-    width: 52px;
-    height: 52px;
-    border: 2.5px solid var(--red);
-    background: rgba(183, 51, 41, 0.08);
+    right: 7%;
+    bottom: 3%;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    font-family: "STKaiti", serif;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--red);
-    letter-spacing: 1px;
-    transform: rotate(6deg);
-    box-shadow: inset 0 0 0 1px rgba(183, 51, 41, 0.4);
+    gap: 8px;
+    z-index: 2;
   }
-  .seal.vert {
-    writing-mode: vertical-rl;
-    letter-spacing: 2px;
-  }
-
-  .qiaopi-footer {
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid var(--line);
-    text-align: center;
-    font-size: 11px;
-    color: var(--ink-light);
-    letter-spacing: 4px;
-    padding-left: 4px;
-    line-height: 1.8;
-  }
-  .qiaopi-footer .movie-line {
-    color: var(--red-deep);
-    font-weight: 700;
-    letter-spacing: 5px;
-    padding-left: 5px;
-    margin-bottom: 4px;
-    font-size: 12px;
-  }
-  .qiaopi-footer .slogan {
-    display: inline-block;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--red);
-    letter-spacing: 6px;
-    padding: 3px 14px 3px 20px;
-    margin: 4px 0 6px;
-    border-left: 2px solid var(--red);
-    border-right: 2px solid var(--red);
-    font-family: "STKaiti", "KaiTi", "楷体", serif;
-  }
-  .qiaopi-footer .subline {
-    font-size: 10px;
-    opacity: 0.65;
-    letter-spacing: 1px;
-    padding: 0;
-  }
-  .qr-block {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-  }
-  .qr-block img {
-    width: 66px;
-    height: 66px;
-    display: block;
+  .qr-on-letter {
+    width: 40px;
+    height: 40px;
     background: #fff;
-    padding: 3px;
+    padding: 2px;
     border: 1.5px solid var(--red);
+    box-shadow: 0 1px 2px rgba(44, 24, 16, 0.18);
     flex-shrink: 0;
   }
-  .qr-block .qr-label {
-    text-align: left;
-    line-height: 1.5;
+  .qr-on-letter img {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
-  .qr-block .qr-title {
-    font-size: 13px;
-    font-weight: 700;
+  /* Caption sits directly on the paper — letter.jpg has been edited to remove
+     the original "A letter after the film" text, so no masking needed here. */
+  .scan-caption {
+    font-size: 9.5px;
     color: var(--red-deep);
-    letter-spacing: 4px;
-    padding-left: 4px;
-  }
-  .qr-block .qr-sub {
-    font-size: 10.5px;
-    color: var(--ink-light);
     letter-spacing: 1.5px;
-    padding-left: 1px;
-    opacity: 0.75;
-    margin-top: 2px;
+    font-family: "STKaiti", "KaiTi", "楷体", serif;
+    white-space: nowrap;
+    font-weight: 700;
   }
 
   /* Action buttons */
@@ -583,12 +367,12 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 18px;
+    margin-top: 14px;
   }
   .actions button {
-    padding: 13px;
+    padding: 11px;
     font-family: inherit;
-    font-size: 15px;
+    font-size: 14.5px;
     letter-spacing: 3px;
     padding-left: 6px;
     border: 1px solid #c9a76e;
@@ -611,29 +395,24 @@
     grid-column: 1 / -1;
   }
 
-  /* Share hint */
-  .share-hint {
-    background: rgba(201, 167, 110, 0.12);
-    border: 1px dashed rgba(201, 167, 110, 0.4);
-    color: #c9a76e;
-    padding: 12px 14px;
-    margin-top: 14px;
-    border-radius: 2px;
-    font-size: 13px;
-    line-height: 1.7;
+  /* Compact share hint (single line, no border box) */
+  .share-hint-mini {
     text-align: center;
+    font-size: 11px;
+    color: rgba(201, 167, 110, 0.7);
     letter-spacing: 1px;
+    margin-top: 8px;
   }
 
   /* Footer */
   .app-footer {
-    margin-top: 40px;
+    margin-top: 28px;
     text-align: center;
     color: #c9a76e;
-    opacity: 0.55;
-    font-size: 11px;
+    opacity: 0.5;
+    font-size: 10.5px;
     letter-spacing: 2px;
-    line-height: 1.9;
+    line-height: 1.7;
   }
 
   /* Loading overlay · 信封仪式 */
@@ -873,8 +652,10 @@
 
   @media (max-width: 380px) {
     .masthead h1 { font-size: 32px; }
-    .qiaopi-card { padding: 22px 18px; }
-    .lp-body { font-size: 13px; }
+    .lp-body { font-size: 13px; line-height: 1.9; }
+    .tail-movie { font-size: 12.5px; letter-spacing: 3px; }
+    .tail-sub { font-size: 10px; }
+    .qr-mini { width: 52px; height: 52px; }
   }
 </style>
 </head>
@@ -905,94 +686,33 @@
 
   <section class="output" id="output">
     <div class="qiaopi-card" id="shareCard">
-      <svg class="cotton-flower" viewBox="0 0 60 60" aria-hidden="true">
-        <g transform="translate(30 30) rotate(-18)">
-          <g fill="#b73329">
-            <ellipse cx="0" cy="-14" rx="7.5" ry="14"/>
-            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(72)"/>
-            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(144)"/>
-            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(216)"/>
-            <ellipse cx="0" cy="-14" rx="7.5" ry="14" transform="rotate(288)"/>
-          </g>
-          <g fill="#8b1e15" opacity="0.55">
-            <ellipse cx="0" cy="-20" rx="3" ry="5"/>
-            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(72)"/>
-            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(144)"/>
-            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(216)"/>
-            <ellipse cx="0" cy="-20" rx="3" ry="5" transform="rotate(288)"/>
-          </g>
-          <g fill="#d4a942">
-            <circle cx="0" cy="-5.5" r="1"/>
-            <circle cx="3.5" cy="-4" r="1"/>
-            <circle cx="-3.5" cy="-4" r="1"/>
-            <circle cx="4.5" cy="0" r="1"/>
-            <circle cx="-4.5" cy="0" r="1"/>
-            <circle cx="2.5" cy="3.5" r="1"/>
-            <circle cx="-2.5" cy="3.5" r="1"/>
-            <circle cx="0" cy="4.5" r="1"/>
-          </g>
-          <circle r="2.8" fill="#8b1e15"/>
-        </g>
-      </svg>
-      <div class="qiaopi-header">
-        <div class="stamp-row">
-          <div class="postmark" id="postmark">
-            <div class="mark-top">汕頭</div>
-            <div class="mark-mid" id="postmarkDate">丙子年</div>
-            <div class="mark-bot">寄</div>
-          </div>
-          <div class="stamp">
-            <div class="s-label">汕頭</div>
-            <div class="s-value">批信</div>
-            <div class="s-bottom">貳分</div>
-          </div>
+      <div class="letter-sheet">
+        <img class="cotton-flower" src="cotton.png" alt="">
+        <div class="stamp">
+          <div class="s-label">汕頭</div>
+          <div class="s-value">批信</div>
+          <div class="s-bottom">貳分</div>
         </div>
-        <div class="qiaopi-title">觀 · 影 · 批</div>
-      </div>
-
-      <div class="compare-block">
-        <div class="col-label">觀影所感</div>
-        <div class="modern-text" id="modernText"></div>
-      </div>
-
-      <div class="divider-classic">
-        <span class="line"></span>
-        <span class="mark">⁕ 批 ⁕</span>
-        <span class="line"></span>
-      </div>
-
-      <div class="compare-block">
-        <div class="col-label">若書於舊時</div>
-        <div class="letter-paper">
-          <div class="lp-title">觀影批</div>
-          <div class="lp-body" id="ancientText"></div>
-          <div class="lp-brand">平安當大賺</div>
-        </div>
-      </div>
-
-      <div class="qiaopi-footer">
-        <div class="movie-line">《給阿嬤的情書》</div>
-        <div class="subline">見字即見影 · 一封觀影批 · 道盡千言萬語</div>
-        <div class="qr-block">
-          <img id="qrImg" alt="扫码写你自己的观影批">
-          <div class="qr-label">
-            <div class="qr-title">掃 一 掃</div>
-            <div class="qr-sub">寫你自己的觀影批</div>
+        <div class="lp-body" id="ancientText"></div>
+        <div class="qr-block-on-letter">
+          <span class="scan-caption">扫一扫，写你自己的观影批</span>
+          <div class="qr-on-letter">
+            <img id="qrImg" alt="掃碼寫你自己的觀影批">
           </div>
         </div>
       </div>
     </div>
 
-    <div class="share-hint">
-      长按图片保存,分享朋友圈
-    </div>
+    <span id="modernText" hidden></span>
 
     <div class="actions">
       <button id="regenBtn">再 翻 一 版</button>
-      <button id="downloadBtn" class="primary">保 存 图 片</button>
+      <button id="downloadBtn" class="primary">保 存 圖 片</button>
     </div>
 
     <button class="back-edit" id="backEditBtn">重 新 書 寫</button>
+
+    <div class="share-hint-mini">長按圖片可保存,分享朋友圈</div>
   </section>
 
   <footer class="app-footer">
@@ -3693,7 +3413,6 @@ function render(modern, result) {
   $('ancientText').innerHTML =
     `<span class="body">${result.body}</span>` +
     `<span class="closing">${result.closing}</span>`;
-  $('postmarkDate').textContent = result.year;
 }
 
 translateBtn.addEventListener('click', doTranslate);
