@@ -348,12 +348,13 @@
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
-    /* For "wider AND aligned" — keep text-column gap equal to the
-       printed column (~10.87cqw) but bump font-size so characters fill
-       more of each column, giving a chunkier, more spacious look.
-       9cqw × 1.21 ≈ 10.89cqw. */
-    font-size: 9cqw;
-    line-height: 1.21;
+    /* Text-column gap (font × line-height) matches the printed column
+       width (~10.89cqw) so each text column lands inside one printed
+       column. Font-size sets character size — smaller font with larger
+       line-height keeps the same column gap but with airier characters.
+       6cqw × 1.815 ≈ 10.89cqw. */
+    font-size: 6cqw;
+    line-height: 1.815;
     letter-spacing: 0.04em;
     color: var(--ink);
     white-space: pre-wrap;
@@ -371,17 +372,17 @@
      a fixed-width wrapper. */
   .scan-caption {
     position: absolute;
-    top: 58%;
+    top: 68%;
     left: 6%;
     width: 4cqw;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     color: var(--red-deep);
-    letter-spacing: 0.2em;
+    letter-spacing: 0.1em;
     font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", serif;
     font-weight: 700;
     line-height: 1;
-    font-size: 3cqw;
+    font-size: 2.3cqw;
     z-index: 2;
     white-space: nowrap;
   }
@@ -712,10 +713,6 @@
 
   @media (max-width: 380px) {
     .masthead h1 { font-size: 32px; }
-    .lp-body { font-size: 17px; line-height: 1.65; }
-    .tail-movie { font-size: 12.5px; letter-spacing: 3px; }
-    .tail-sub { font-size: 10px; }
-    .qr-mini { width: 52px; height: 52px; }
   }
 </style>
 </head>
