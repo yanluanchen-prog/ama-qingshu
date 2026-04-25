@@ -317,7 +317,7 @@
   .lp-title {
     position: absolute;
     top: 7%;
-    right: 9%;
+    right: 11%;
     width: 10cqw;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
@@ -390,7 +390,7 @@
   /* QR also lives in col 8, pinned to the bottom-left. */
   .qr-on-letter {
     position: absolute;
-    left: 7%;
+    left: 8.5%;
     bottom: 6%;
     width: 8cqw;
     aspect-ratio: 1 / 1;
@@ -711,6 +711,63 @@
   }
   .toast.show { opacity: 1; }
 
+  /* Save preview overlay — shows the rendered image so user can long-press
+     to save to album. Required because WeChat WebView ignores <a download>.
+     -webkit-touch-callout: default keeps iOS/WeChat long-press menu enabled. */
+  .save-preview {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 12, 6, 0.94);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 200;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 56px 18px 28px;
+  }
+  .save-preview.show { display: flex; }
+  .save-preview-hint {
+    color: #c9a76e;
+    font-size: 15px;
+    letter-spacing: 4px;
+    text-align: center;
+    font-family: "LXGW WenKai TC", "STKaiti", serif;
+    margin-bottom: 18px;
+    padding-left: 4px;
+    opacity: 0.95;
+  }
+  .save-preview-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+    -webkit-touch-callout: default;
+    -webkit-user-select: auto;
+    user-select: auto;
+    pointer-events: auto;
+  }
+  .save-preview-close {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 167, 110, 0.5);
+    background: rgba(0, 0, 0, 0.45);
+    color: #f3e7cf;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-family: inherit;
+  }
+
   @media (max-width: 380px) {
     .masthead h1 { font-size: 32px; }
   }
@@ -793,6 +850,12 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="save-preview" id="savePreview">
+  <button class="save-preview-close" id="savePreviewClose" aria-label="关闭">×</button>
+  <div class="save-preview-hint">长 按 图 片 · 保 存 到 相 册</div>
+  <img class="save-preview-img" id="savePreviewImg" alt="观影批">
+</div>
 
 <div class="delivered" id="delivered">
   <div class="delivered-content">
@@ -3116,7 +3179,7 @@ var qrcode = function() {
    【部署配置】 把下面这行改成你的正式域名,然后分享卡二维码会自动指向那里
    未设置时,二维码会自动使用当前页面地址(适合本地测试)
 ============================================================ */
-const APP_URL = 'https://yanluanchen-prog.github.io/ama-qingshu/'; // 二维码指向 GitHub Pages
+const APP_URL = 'https://amaqingshu.com/'; // 二维码指向自定义域名 (CNAME)
 
 /* ============================================================
    侨批体翻译引擎
@@ -3534,16 +3597,14 @@ function showDelivered() {
   setTimeout(() => d.classList.remove('show'), 3000);
 }
 
-// Download image — keep this fast: render at 2x, no artificial delay,
-// and skip the 批已送達 ceremony (it added 3s of pure waiting before
-// the user saw their image).
+// Save image — render the card, then show a fullscreen preview so the
+// user can long-press to save to their album. WeChat WebView blocks
+// programmatic <a download>, so the long-press path is the only reliable
+// way to land in the photo album from inside WeChat.
 $('downloadBtn').addEventListener('click', async () => {
   const card = $('shareCard');
   showLoading(true);
   try {
-    // Make sure all <img> children are decoded before snapshotting,
-    // otherwise html-to-image may produce a blank/partial card on
-    // first save (especially on slower phones / WeChat WebView).
     const imgs = card.querySelectorAll('img');
     await Promise.all(
       Array.from(imgs).map((img) => {
@@ -3558,24 +3619,23 @@ $('downloadBtn').addEventListener('click', async () => {
       pixelRatio: 3,
       backgroundColor: null,
       cacheBust: false,
-      // Skip font CSS embedding — Google Fonts / jsdelivr CSS is cross-origin
-      // and can't be read by the page; the library spends seconds failing to
-      // fetch it. The page already falls back to system Kaiti for export.
       skipFonts: true
     });
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = `侨批_${Date.now()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
     showLoading(false);
-    showToast('已保存');
+    const previewImg = $('savePreviewImg');
+    previewImg.src = dataUrl;
+    const overlay = $('savePreview');
+    overlay.scrollTop = 0;
+    overlay.classList.add('show');
   } catch (err) {
     console.error(err);
     showLoading(false);
-    showToast('保存失败,请长按图片保存');
+    showToast('生成失败,请重试');
   }
+});
+
+$('savePreviewClose').addEventListener('click', () => {
+  $('savePreview').classList.remove('show');
 });
 </script>
 </body>
