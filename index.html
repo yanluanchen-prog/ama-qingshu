@@ -6,9 +6,12 @@
 <meta name="format-detection" content="telephone=no">
 <title>观影批 · 给阿嬷的情书</title>
 <meta name="description" content="看完电影《给阿嬷的情书》,把你的观后感写成一封旧时侨批。一封观影批,替你道尽千言万语。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<!-- Google Fonts removed: Noto Serif SC / ZCOOL XiaoWei / Ma Shan Zheng
+     are slow or partially blocked from mainland China and the system
+     fallbacks ("STSong", "SimSun", "PingFang SC") cover the same UI.
+     LXGW WenKai is kept (qiaopi text needs the brush look) but is the
+     only remaining external font dependency. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-tc-webfont@1.7.0/style.css">
 <style>
@@ -804,8 +807,8 @@
   <section class="output" id="output">
     <div class="qiaopi-card" id="shareCard">
       <div class="letter-sheet">
-        <img class="letter-bg" src="letter.png" alt="">
-        <img class="cotton-flower" src="cotton.png" alt="">
+        <img class="letter-bg" src="letter.webp" alt="">
+        <img class="cotton-flower" src="cotton.webp" alt="">
         <div class="lp-title">觀影批</div>
         <div class="lp-body" id="ancientText"></div>
         <span class="scan-caption">扫码写你自己的观影批</span>
@@ -837,7 +840,7 @@
 <div class="loading" id="loading">
   <div class="envelope-scene">
     <div class="envelope-float">
-      <img class="envelope-img" src="envelope.png" alt="观影批">
+      <img class="envelope-img" src="envelope.webp" alt="观影批">
       <div class="env-overlay">
         <div class="env-side env-side-left">汕頭寄</div>
         <div class="env-title-wrap">
