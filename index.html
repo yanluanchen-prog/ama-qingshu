@@ -255,42 +255,6 @@
     position: relative;
   }
 
-  /* Snapshot-only: reveal the modern-source header above the letter.
-     No frame, no overrides on the letter — the qiaopi must look
-     identical to what's on screen so the design we crafted is what
-     gets shared. */
-  .modern-source {
-    display: none;
-    width: 100%;
-    margin: 0 0 16px;
-    padding: 16px 20px 18px;
-    background: #fbf6ec;
-    border: 1px solid #d8c397;
-    box-sizing: border-box;
-    box-shadow: 0 2px 6px rgba(44, 24, 16, 0.12);
-  }
-  .qiaopi-card.snapshotting .modern-source { display: block; }
-  .modern-source-label {
-    font-size: 11px;
-    color: #8b1e15;
-    letter-spacing: 6px;
-    text-align: center;
-    margin-bottom: 10px;
-    padding-bottom: 9px;
-    font-weight: 700;
-    font-family: "LXGW WenKai TC", "STKaiti", serif;
-    border-bottom: 1px dashed #c9a76e;
-  }
-  .modern-source-text {
-    font-size: 14px;
-    line-height: 1.75;
-    color: #2a1e15;
-    letter-spacing: 0.5px;
-    text-align: center;
-    white-space: pre-wrap;
-    word-break: break-word;
-    font-family: -apple-system, "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
-  }
 
   /* Letter sheet: letter.png (1135×1654) is rendered as an <img> so
      html-to-image reliably captures it (CSS background images are
@@ -839,10 +803,6 @@
 
   <section class="output" id="output">
     <div class="qiaopi-card" id="shareCard">
-      <div class="modern-source">
-        <div class="modern-source-label">观 影 所 感</div>
-        <div class="modern-source-text" id="modernSourceText"></div>
-      </div>
       <div class="letter-sheet">
         <img class="letter-bg" src="letter.png" alt="">
         <img class="cotton-flower" src="cotton.png" alt="">
@@ -3568,7 +3528,6 @@ if (backEditBtn) {
 
 function render(modern, result) {
   $('modernText').textContent = modern;
-  $('modernSourceText').textContent = modern;
   $('ancientText').innerHTML =
     `<span class="body">${result.body}</span>` +
     `<span class="closing">${result.closing}</span>`;
@@ -3676,7 +3635,6 @@ async function ensureImgIsDataUrl(img) {
 $('downloadBtn').addEventListener('click', async () => {
   const card = $('shareCard');
   showLoading(true);
-  card.classList.add('snapshotting');
   const imgs = Array.from(card.querySelectorAll('img'));
   try {
     await Promise.all(
@@ -3715,7 +3673,6 @@ $('downloadBtn').addEventListener('click', async () => {
         delete img.dataset.origSrc;
       }
     });
-    card.classList.remove('snapshotting');
     showLoading(false);
   }
 });
