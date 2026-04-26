@@ -3641,6 +3641,34 @@ function showDelivered() {
   setTimeout(() => d.classList.remove('show'), 3000);
 }
 
+// Force <img src> to a data URL by re-fetching. html-to-image's
+// foreignObject pipeline drops regular <img> resources in iOS / WeChat
+// WebView (letter.png and cotton.png were missing from the snapshot),
+// so we inline them directly into the DOM before the snapshot runs.
+const _imgDataUrlCache = {};
+async function ensureImgIsDataUrl(img) {
+  const src = img.getAttribute('src');
+  if (!src || src.startsWith('data:')) return;
+  if (!_imgDataUrlCache[src]) {
+    const resp = await fetch(src);
+    const blob = await resp.blob();
+    _imgDataUrlCache[src] = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+  }
+  img.dataset.origSrc = src;
+  img.src = _imgDataUrlCache[src];
+  if (!(img.complete && img.naturalWidth > 0)) {
+    await new Promise((r) => {
+      img.addEventListener('load', r, { once: true });
+      img.addEventListener('error', r, { once: true });
+    });
+  }
+}
+
 // Save image — render the card, then show a fullscreen preview so the
 // user can long-press to save to their album. WeChat WebView blocks
 // programmatic <a download>, so the long-press path is the only reliable
@@ -3648,13 +3676,11 @@ function showDelivered() {
 $('downloadBtn').addEventListener('click', async () => {
   const card = $('shareCard');
   showLoading(true);
-  // .snapshotting reveals the modern-source header and switches the card
-  // into the framed share layout. Loading overlay hides the toggle.
   card.classList.add('snapshotting');
+  const imgs = Array.from(card.querySelectorAll('img'));
   try {
-    const imgs = card.querySelectorAll('img');
     await Promise.all(
-      Array.from(imgs).map((img) => {
+      imgs.map((img) => {
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         return new Promise((res) => {
           img.addEventListener('load', res, { once: true });
@@ -3662,10 +3688,16 @@ $('downloadBtn').addEventListener('click', async () => {
         });
       })
     );
+    await Promise.all(imgs.map(ensureImgIsDataUrl));
     const dataUrl = await htmlToImage.toPng(card, {
       pixelRatio: 3,
       backgroundColor: '#ffffff',
       cacheBust: false,
+      // skipFonts: the lxgw / Google Fonts stylesheets are cross-origin
+      // and can't be read via cssRules — html-to-image throws SecurityError
+      // for every sheet and wastes seconds. Skipping is faster, and the
+      // SVG foreignObject still renders whatever fonts the browser has
+      // loaded in memory (LXGW WenKai TC is loaded via <link> at boot).
       skipFonts: true
     });
     const previewImg = $('savePreviewImg');
@@ -3677,6 +3709,12 @@ $('downloadBtn').addEventListener('click', async () => {
     console.error(err);
     showToast('生成失败,请重试');
   } finally {
+    imgs.forEach((img) => {
+      if (img.dataset.origSrc) {
+        img.src = img.dataset.origSrc;
+        delete img.dataset.origSrc;
+      }
+    });
     card.classList.remove('snapshotting');
     showLoading(false);
   }
