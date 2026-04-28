@@ -12,8 +12,10 @@
      LXGW WenKai is kept (qiaopi text needs the brush look) but is the
      only remaining external font dependency. -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- lxgw-wenkai-webfont (SC) covers both Simplified and Traditional Han.
+     The TC-specific package only exists up to 1.2.0, so we drop it and
+     let the SC font handle everything. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-tc-webfont@1.7.0/style.css">
 <style>
   :root {
     --paper: #f3e7cf;
@@ -320,9 +322,33 @@
   /* 觀影批 title in col 1 (right edge of paper at 93.3%). The inner red
      border sits at ~6.7% from the right, so right: 7.5% pulls the title
      fully inside the border instead of bleeding past it. */
-  .lp-title {
+  /* Movie title sits at the TOP of col 1, smaller and ink-coloured so it
+     reads as a label above the red 觀影批 mark. 《》 brackets are
+     full-width so they stack vertically correctly in writing-mode. */
+  .lp-subtitle {
     position: absolute;
     top: 7%;
+    right: 11%;
+    width: 10cqw;
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    font-size: 3.6cqw;
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+  /* 觀影批 sits below the movie title, in col 1 (right edge of paper at
+     93.3%). The inner red border sits at ~6.7% from the right, so
+     right: 7.5% pulls the title fully inside the border. */
+  .lp-title {
+    position: absolute;
+    top: 42%;
     right: 11%;
     width: 10cqw;
     writing-mode: vertical-rl;
@@ -810,6 +836,7 @@
         <img class="letter-bg" src="letter.webp" alt="">
         <img class="cotton-flower" src="cotton.webp" alt="">
         <div class="lp-title">觀影批</div>
+        <div class="lp-subtitle">《給阿嬤的情書》</div>
         <div class="lp-body" id="ancientText"></div>
         <span class="scan-caption">扫码写你自己的观影批</span>
         <div class="qr-on-letter">
@@ -3603,23 +3630,128 @@ function showDelivered() {
   setTimeout(() => d.classList.remove('show'), 3000);
 }
 
-// Force <img src> to a data URL by re-fetching. html-to-image's
-// foreignObject pipeline drops regular <img> resources in iOS / WeChat
-// WebView (letter.png and cotton.png were missing from the snapshot),
-// so we inline them directly into the DOM before the snapshot runs.
+// Embed a minimal LXGW WenKai @font-face CSS for snapshot use.
+// The full font is split into ~100 subsets totalling many MB, so we
+// fetch the @font-face stylesheet once, parse unicode-range, intersect
+// with the chars actually in the card, and only fetch + inline the
+// matching woff2 files. Result is typically 2–5 subsets, ~100–300 KB.
+const _lxgwBase = 'https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/';
+const _lxgwSubsetCache = {}; // url -> data URL
+let _lxgwFaceList = null;    // [{ weight, srcUrl, ranges: [[lo,hi]...] }]
+
+async function _loadLxgwFaceList() {
+  if (_lxgwFaceList) return _lxgwFaceList;
+  // Pull the per-weight stylesheets we actually use (regular + bold).
+  const sheets = ['lxgwwenkai-regular.css', 'lxgwwenkai-bold.css'];
+  const cssChunks = await Promise.all(
+    sheets.map((s) => fetch(_lxgwBase + s).then((r) => r.text()))
+  );
+  const css = cssChunks.join('\n');
+  const faces = [];
+  const blockRe = /@font-face\s*\{([^}]+)\}/g;
+  let m;
+  while ((m = blockRe.exec(css)) !== null) {
+    const body = m[1];
+    const src = body.match(/url\(['"]?(\.\/files\/[^'")]+\.woff2)['"]?\)/);
+    const range = body.match(/unicode-range:\s*([^;}\n]+)/i);
+    const weight = body.match(/font-weight:\s*(\d+)/);
+    if (!src || !range) continue;
+    faces.push({
+      weight: weight ? +weight[1] : 400,
+      srcPath: src[1].replace(/^\.\//, ''),
+      rangeText: range[1].trim(),
+      ranges: _parseUnicodeRanges(range[1])
+    });
+  }
+  _lxgwFaceList = faces;
+  return faces;
+}
+
+function _parseUnicodeRanges(s) {
+  return s.split(',').map((part) => {
+    const r = part.trim().replace(/^U\+/i, '');
+    const [a, b] = r.split('-');
+    const lo = parseInt(a, 16);
+    const hi = b ? parseInt(b, 16) : lo;
+    return [lo, hi];
+  }).filter(([lo, hi]) => Number.isFinite(lo) && Number.isFinite(hi));
+}
+
+async function buildLxgwSubsetCss(rootEl) {
+  const text = rootEl.textContent || '';
+  const codepoints = new Set();
+  for (const ch of text) codepoints.add(ch.codePointAt(0));
+  if (codepoints.size === 0) return '';
+
+  const faces = await _loadLxgwFaceList();
+  const needed = faces.filter((f) =>
+    f.ranges.some(([lo, hi]) => {
+      for (const cp of codepoints) if (cp >= lo && cp <= hi) return true;
+      return false;
+    })
+  );
+
+  const dataUrls = await Promise.all(
+    needed.map(async (f) => {
+      if (_lxgwSubsetCache[f.srcPath]) return _lxgwSubsetCache[f.srcPath];
+      const buf = await fetch(_lxgwBase + f.srcPath).then((r) => r.arrayBuffer());
+      const bytes = new Uint8Array(buf);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      const dataUrl = 'data:font/woff2;base64,' + btoa(bin);
+      _lxgwSubsetCache[f.srcPath] = dataUrl;
+      return dataUrl;
+    })
+  );
+
+  return needed.map((f, i) => `@font-face{
+  font-family:'LXGW WenKai';
+  font-style:normal;
+  font-weight:${f.weight};
+  font-display:swap;
+  src:url(${dataUrls[i]}) format('woff2');
+  unicode-range:${f.rangeText};
+}`).join('\n');
+}
+
+// Force <img src> to a PNG data URL. Two reasons:
+//   1. html-to-image's foreignObject pipeline drops regular <img>
+//      resources in iOS / WeChat WebView, so we inline them into the DOM.
+//   2. iOS WebKit's foreignObject sandbox doesn't decode WebP, so a
+//      data:image/webp <img> still renders blank. Transcoding through a
+//      canvas to PNG keeps the page-load fast (WebP over the wire) while
+//      giving the snapshot a format it can rasterize.
+//
+// Uses an <img> element (not createImageBitmap) for the decode step
+// because some older WeChat WebKit builds lack createImageBitmap support
+// for WebP, which was failing silently and leaving the WebP <img> in
+// place — that's what showed up as the bare paper-color fallback.
 const _imgDataUrlCache = {};
+function _loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.decoding = 'sync';
+    im.onload = () => resolve(im);
+    im.onerror = (e) => reject(new Error('image load failed: ' + src));
+    im.src = src;
+  });
+}
 async function ensureImgIsDataUrl(img) {
   const src = img.getAttribute('src');
-  if (!src || src.startsWith('data:')) return;
+  if (!src || src.startsWith('data:image/png')) return;
   if (!_imgDataUrlCache[src]) {
-    const resp = await fetch(src);
-    const blob = await resp.blob();
-    _imgDataUrlCache[src] = await new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result);
-      r.onerror = reject;
-      r.readAsDataURL(blob);
-    });
+    try {
+      const loaded = await _loadImage(src);
+      const canvas = document.createElement('canvas');
+      canvas.width = loaded.naturalWidth || loaded.width;
+      canvas.height = loaded.naturalHeight || loaded.height;
+      canvas.getContext('2d').drawImage(loaded, 0, 0);
+      _imgDataUrlCache[src] = canvas.toDataURL('image/png');
+    } catch (err) {
+      console.error('[snapshot] image transcode failed:', src, err);
+      return;
+    }
   }
   img.dataset.origSrc = src;
   img.src = _imgDataUrlCache[src];
@@ -3635,32 +3767,157 @@ async function ensureImgIsDataUrl(img) {
 // user can long-press to save to their album. WeChat WebView blocks
 // programmatic <a download>, so the long-press path is the only reliable
 // way to land in the photo album from inside WeChat.
-$('downloadBtn').addEventListener('click', async () => {
+// Direct canvas renderer. iOS Safari renders SVG-as-<img> in a sandbox
+// that refuses to load @font-face URLs (even data: ones), so html-to-image
+// always rasterized text in system kaiti on iOS no matter what we tried.
+// Drawing onto a <canvas> with ctx.fillText uses the document's
+// already-loaded fonts, which works on iOS.
+//
+// Layout strategy: read everything from the live DOM. For each visible
+// text node we collect per-character bounding rects via the Range API
+// (the browser already laid the text out using LXGW), then re-draw each
+// character on canvas. This way the snapshot is pixel-equivalent to what
+// the user sees on the page, regardless of platform.
+function _loadImageEl(src) {
+  return new Promise((resolve, reject) => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.decoding = 'sync';
+    im.onload = () => resolve(im);
+    im.onerror = () => reject(new Error('image load failed: ' + src));
+    im.src = src;
+  });
+}
+
+function _parseRotationRad(transformStr) {
+  if (!transformStr || transformStr === 'none') return 0;
+  const m = transformStr.match(/matrix\(([^)]+)\)/);
+  if (!m) return 0;
+  const parts = m[1].split(',').map(parseFloat);
+  return Math.atan2(parts[1], parts[0]);
+}
+
+async function renderShareCanvas() {
   const card = $('shareCard');
+  const sheet = card.querySelector('.letter-sheet');
+  // Make sure web fonts are decoded before measuring/drawing.
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+  const cardRect = card.getBoundingClientRect();
+  const PR = Math.max(2, Math.min(3, window.devicePixelRatio || 2));
+  const W = Math.round(cardRect.width * PR);
+  const H = Math.round(cardRect.height * PR);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  const toLocal = (rect) => ({
+    x: (rect.left - cardRect.left) * PR,
+    y: (rect.top - cardRect.top) * PR,
+    w: rect.width * PR,
+    h: rect.height * PR
+  });
+
+  // 1. Letter-sheet background image
+  const letterBg = sheet.querySelector('.letter-bg');
+  if (letterBg && letterBg.src) {
+    const img = await _loadImageEl(letterBg.src);
+    const r = toLocal(letterBg.getBoundingClientRect());
+    ctx.drawImage(img, r.x, r.y, r.w, r.h);
+  }
+
+  // 2. Cotton flower (rotated)
+  const cotton = sheet.querySelector('.cotton-flower');
+  if (cotton && cotton.src) {
+    const img = await _loadImageEl(cotton.src);
+    const r = toLocal(cotton.getBoundingClientRect());
+    const cs = getComputedStyle(cotton);
+    const angle = _parseRotationRad(cs.transform);
+    ctx.save();
+    ctx.translate(r.x + r.w / 2, r.y + r.h / 2);
+    ctx.rotate(angle);
+    ctx.drawImage(img, -r.w / 2, -r.h / 2, r.w, r.h);
+    ctx.restore();
+  }
+
+  // 3. Text — walk every text node inside the sheet and draw character
+  //    by character at the position the browser already laid out.
+  const walker = document.createTreeWalker(sheet, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.textContent) return NodeFilter.FILTER_REJECT;
+      const p = node.parentElement;
+      if (!p) return NodeFilter.FILTER_REJECT;
+      const tag = p.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+      const cs = getComputedStyle(p);
+      if (cs.visibility === 'hidden' || cs.display === 'none') return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
+  const range = document.createRange();
+  let node;
+  while ((node = walker.nextNode())) {
+    const parent = node.parentElement;
+    const cs = getComputedStyle(parent);
+    const fontSize = parseFloat(cs.fontSize);
+    if (!fontSize) continue;
+    ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${fontSize * PR}px ${cs.fontFamily}`;
+    ctx.fillStyle = cs.color;
+
+    const text = node.textContent;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '\n' || ch === '\r' || ch === '\t') continue;
+      range.setStart(node, i);
+      range.setEnd(node, i + 1);
+      const rect = range.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) continue;
+      const x = (rect.left - cardRect.left) * PR;
+      const y = (rect.top - cardRect.top) * PR;
+      ctx.fillText(ch, x, y);
+    }
+  }
+
+  // 4. QR code (with its white bg + red border, since we drew over those
+  //    when we walked the text but not the QR container itself).
+  const qrWrap = sheet.querySelector('.qr-on-letter');
+  const qrImg = qrWrap && qrWrap.querySelector('img');
+  if (qrWrap && qrImg && qrImg.src) {
+    const wrapR = toLocal(qrWrap.getBoundingClientRect());
+    const wrapCS = getComputedStyle(qrWrap);
+    ctx.fillStyle = wrapCS.backgroundColor || '#fff';
+    ctx.fillRect(wrapR.x, wrapR.y, wrapR.w, wrapR.h);
+    const borderW = parseFloat(wrapCS.borderTopWidth) * PR || 0;
+    if (borderW > 0) {
+      ctx.strokeStyle = wrapCS.borderTopColor || '#b73329';
+      ctx.lineWidth = borderW;
+      ctx.strokeRect(
+        wrapR.x + borderW / 2,
+        wrapR.y + borderW / 2,
+        wrapR.w - borderW,
+        wrapR.h - borderW
+      );
+    }
+    const qImg = await _loadImageEl(qrImg.src);
+    const qR = toLocal(qrImg.getBoundingClientRect());
+    ctx.drawImage(qImg, qR.x, qR.y, qR.w, qR.h);
+  }
+
+  return canvas;
+}
+
+$('downloadBtn').addEventListener('click', async () => {
   showLoading(true);
-  const imgs = Array.from(card.querySelectorAll('img'));
   try {
-    await Promise.all(
-      imgs.map((img) => {
-        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-        return new Promise((res) => {
-          img.addEventListener('load', res, { once: true });
-          img.addEventListener('error', res, { once: true });
-        });
-      })
-    );
-    await Promise.all(imgs.map(ensureImgIsDataUrl));
-    const dataUrl = await htmlToImage.toPng(card, {
-      pixelRatio: 3,
-      backgroundColor: '#ffffff',
-      cacheBust: false,
-      // skipFonts: the lxgw / Google Fonts stylesheets are cross-origin
-      // and can't be read via cssRules — html-to-image throws SecurityError
-      // for every sheet and wastes seconds. Skipping is faster, and the
-      // SVG foreignObject still renders whatever fonts the browser has
-      // loaded in memory (LXGW WenKai TC is loaded via <link> at boot).
-      skipFonts: true
-    });
+    const canvas = await renderShareCanvas();
+    const dataUrl = canvas.toDataURL('image/png');
     const previewImg = $('savePreviewImg');
     previewImg.src = dataUrl;
     const overlay = $('savePreview');
@@ -3670,12 +3927,6 @@ $('downloadBtn').addEventListener('click', async () => {
     console.error(err);
     showToast('生成失败,请重试');
   } finally {
-    imgs.forEach((img) => {
-      if (img.dataset.origSrc) {
-        img.src = img.dataset.origSrc;
-        delete img.dataset.origSrc;
-      }
-    });
     showLoading(false);
   }
 });
