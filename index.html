@@ -322,34 +322,15 @@
   /* 觀影批 title in col 1 (right edge of paper at 93.3%). The inner red
      border sits at ~6.7% from the right, so right: 7.5% pulls the title
      fully inside the border instead of bleeding past it. */
-  /* Movie title sits at the TOP of col 1, smaller and ink-coloured so it
-     reads as a label above the red 觀影批 mark. 《》 brackets are
-     full-width so they stack vertically correctly in writing-mode. */
-  .lp-subtitle {
-    position: absolute;
-    top: 7%;
-    right: 11%;
-    width: 10cqw;
-    writing-mode: vertical-rl;
-    -webkit-writing-mode: vertical-rl;
-    font-family: "LXGW WenKai TC", "LXGW WenKai", "KaiTi", "STKaiti", "楷体", serif;
-    font-weight: 600;
-    color: var(--ink);
-    text-align: center;
-    line-height: 1;
-    letter-spacing: 0.18em;
-    font-size: 3.6cqw;
-    z-index: 2;
-    white-space: nowrap;
-  }
-
-  /* 觀影批 sits below the movie title, in col 1 (right edge of paper at
-     93.3%). The inner red border sits at ~6.7% from the right, so
-     right: 7.5% pulls the title fully inside the border. */
+  /* 《給阿嬤的情書》觀影批 — single column 1 title. Both halves are
+     red and same size so they read as one stamped header. Font size is
+     tuned so 11 chars fit vertically inside the inner border, and chars
+     stay narrower than the printed col 1 width (~8.3% of card after the
+     red border) so they don't kiss the column lines. */
   .lp-title {
     position: absolute;
-    top: 42%;
-    right: 11%;
+    top: 7%;
+    right: 7.5%;
     width: 10cqw;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
@@ -358,8 +339,8 @@
     color: var(--red-deep);
     text-align: center;
     line-height: 1;
-    letter-spacing: 0.55em;
-    font-size: 8cqw;
+    letter-spacing: 0.25em;
+    font-size: 6.5cqw;
     z-index: 2;
     text-shadow: 0 1px 0 rgba(255, 240, 220, 0.2);
     white-space: nowrap;
@@ -835,8 +816,7 @@
       <div class="letter-sheet">
         <img class="letter-bg" src="letter.webp" alt="">
         <img class="cotton-flower" src="cotton.webp" alt="">
-        <div class="lp-title">觀影批</div>
-        <div class="lp-subtitle">《給阿嬤的情書》</div>
+        <div class="lp-title">《給阿嬤的情書》觀影批</div>
         <div class="lp-body" id="ancientText"></div>
         <span class="scan-caption">扫码写你自己的观影批</span>
         <div class="qr-on-letter">
