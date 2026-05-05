@@ -319,18 +319,20 @@
      All sizes below are in cqw (% of letter-sheet width) so text
      columns align with the printed lines on every screen size. */
 
-  /* 觀影批 title in col 1 (right edge of paper at 93.3%). The inner red
-     border sits at ~6.7% from the right, so right: 7.5% pulls the title
-     fully inside the border instead of bleeding past it. */
-  /* 《給阿嬤的情書》觀影批 — single column 1 title. Both halves are
-     red and same size so they read as one stamped header. Font size is
-     tuned so 11 chars fit vertically inside the inner border, and chars
-     stay narrower than the printed col 1 width (~8.3% of card after the
-     red border) so they don't kiss the column lines. */
+  /* 「給阿嬤的情書」觀影批 — single column 1 title. Both halves are
+     red and same size so they read as one stamped header. Corner
+     brackets 「」 are used instead of 《》 because 《》 stay upright in
+     writing-mode: vertical-rl and read as horizontal chevrons mid
+     column. right: 10% (rather than centred on col 1 at ~7.35%) gives
+     the chars ~1% breathing room on the LEFT printed line of col 1
+     and ~2.5% on the right — without it, 觀 was kissing the right
+     column rule. Font size tuned so 11 chars fit vertically inside
+     the inner border, narrower than col 1's inner ~8.3% so chars
+     don't kiss the column lines. */
   .lp-title {
     position: absolute;
     top: 7%;
-    right: 7.5%;
+    right: 10%;
     width: 10cqw;
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
@@ -792,7 +794,7 @@
 
   <header class="masthead">
     <h1>观影批</h1>
-    <div class="tagline">看完《给阿嬷的情书》<br>把感受写成一封侨批</div>
+    <div class="tagline">看完「给阿嬷的情书」<br>把感受写成一封侨批</div>
   </header>
 
   <section class="input-card">
@@ -816,7 +818,7 @@
       <div class="letter-sheet">
         <img class="letter-bg" src="letter.webp" alt="">
         <img class="cotton-flower" src="cotton.webp" alt="">
-        <div class="lp-title">《給阿嬤的情書》觀影批</div>
+        <div class="lp-title">「給阿嬤的情書」觀影批</div>
         <div class="lp-body" id="ancientText"></div>
         <span class="scan-caption">扫码写你自己的观影批</span>
         <div class="qr-on-letter">
@@ -838,7 +840,7 @@
   </section>
 
   <footer class="app-footer">
-    电影《给阿嬷的情书》正在热映<br>
+    电影「给阿嬷的情书」正在热映<br>
     走出影院,把你的观后感,分享给更多的人
   </footer>
 
