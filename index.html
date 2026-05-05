@@ -14,8 +14,16 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <!-- lxgw-wenkai-webfont (SC) covers both Simplified and Traditional Han.
      The TC-specific package only exists up to 1.2.0, so we drop it and
-     let the SC font handle everything. -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+     let the SC font handle everything.
+
+     Loaded NON render-blocking via the media-swap trick: jsdelivr can
+     stall for tens of seconds from mainland China and was blocking
+     paint on the whole page. The browser renders with system kaiti
+     fallbacks immediately, then swaps in LXGW once the stylesheet
+     resolves. -->
+<link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css"></noscript>
 <style>
   :root {
     --paper: #f3e7cf;
