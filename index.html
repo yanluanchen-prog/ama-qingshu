@@ -3498,6 +3498,26 @@ const translateBtn = $('translateBtn');
 
 let lastInput = '';
 
+// letter.webp / cotton.webp are <img loading="lazy"> for first-paint
+// speed, but the lazy attribute means they don't start fetching until
+// the qiaopi card is visible — and on a slow link, that produces a
+// visible "blank paper while text is already there" frame after the
+// translate ritual. Warm them into the browser cache as soon as the
+// user is plausibly headed for the translate flow (focus or first
+// keystroke). The translate button also calls this as a safety net.
+let _shareImagesWarmed = false;
+function warmShareImages() {
+  if (_shareImagesWarmed) return;
+  _shareImagesWarmed = true;
+  ['letter.webp', 'cotton.webp'].forEach((src) => {
+    const im = new Image();
+    im.decoding = 'async';
+    im.src = src;
+  });
+}
+input.addEventListener('focus', warmShareImages, { once: true });
+input.addEventListener('input', warmShareImages, { once: true });
+
 function showToast(msg) {
   const t = $('toast');
   t.textContent = msg;
@@ -3523,6 +3543,7 @@ function doTranslate() {
     return;
   }
   lastInput = text;
+  warmShareImages(); // safety net if focus/input listeners didn't fire
   showLoading(true);
 
   // Artificial delay — part of the "ritual" of sending a letter
