@@ -816,6 +816,12 @@ var _hmt = _hmt || [];
 </head>
 <body>
 
+<!-- 微信分享缩略图:微信不读 og:image,只扫 DOM 中实际加载的 JPG/PNG。
+     必须 ≥300×300、不能 webp、不能 lazy-load,否则不会被识别为缩略图。 -->
+<img src="share-card.jpg" alt="" width="696" height="800"
+     style="position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none"
+     aria-hidden="true">
+
 <div class="app">
 
   <header class="masthead">
