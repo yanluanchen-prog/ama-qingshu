@@ -6,24 +6,29 @@
 <meta name="format-detection" content="telephone=no">
 <title>观影批 · 给阿嬷的情书</title>
 <meta name="description" content="看完电影《给阿嬷的情书》,把你的观后感写成一封旧时侨批。一封观影批,替你道尽千言万语。">
+<!-- Open Graph / 微信分享卡片 -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="观影批 · 给阿嬷的情书">
+<meta property="og:description" content="看完电影《给阿嬷的情书》,把你的观后感写成一封旧时侨批。一封观影批,替你道尽千言万语。">
+<meta property="og:url" content="https://amaqingshu.com/">
+<meta property="og:image" content="https://amaqingshu.com/share-card.jpg">
+<meta property="og:image:width" content="696">
+<meta property="og:image:height" content="800">
+<meta itemprop="image" content="https://amaqingshu.com/share-card.jpg">
+<link rel="image_src" href="https://amaqingshu.com/share-card.jpg">
 <!-- Google Fonts removed: Noto Serif SC / ZCOOL XiaoWei / Ma Shan Zheng
      are slow or partially blocked from mainland China and the system
      fallbacks ("STSong", "SimSun", "PingFang SC") cover the same UI.
      LXGW WenKai is kept (qiaopi text needs the brush look) but is the
      only remaining external font dependency. -->
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://registry.npmmirror.com" crossorigin>
 <!-- lxgw-wenkai-webfont (SC) covers both Simplified and Traditional Han.
-     The TC-specific package only exists up to 1.2.0, so we drop it and
-     let the SC font handle everything.
-
-     Loaded NON render-blocking via the media-swap trick: jsdelivr can
-     stall for tens of seconds from mainland China and was blocking
-     paint on the whole page. The browser renders with system kaiti
-     fallbacks immediately, then swaps in LXGW once the stylesheet
-     resolves. -->
-<link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
-<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css"></noscript>
+     Served from registry.npmmirror.com (Aliyun's npm mirror) — ~80ms
+     from mainland China vs jsdelivr's 1.5–7s. Still loaded async via
+     the media-swap trick so any CDN hiccup never blocks first paint. -->
+<link rel="preload" as="style" href="https://registry.npmmirror.com/lxgw-wenkai-webfont/1.7.0/files/style.css">
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://registry.npmmirror.com/lxgw-wenkai-webfont/1.7.0/files/style.css">
+<noscript><link rel="stylesheet" href="https://registry.npmmirror.com/lxgw-wenkai-webfont/1.7.0/files/style.css"></noscript>
 <style>
   :root {
     --paper: #f3e7cf;
